@@ -13,14 +13,19 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sanitalocation.app"
+      "bundleIdentifier": "com.bodaahmed500a.sanitalocation"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.sanitalocation.app"
+      "package": "com.bodaahmed500a.sanitalocation"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ceaa5681-6ac9-4505-a4f2-6f213c8ce3d7"
+      }
     }
   }
 }
