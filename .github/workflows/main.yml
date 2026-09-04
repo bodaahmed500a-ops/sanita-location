@@ -6,30 +6,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          
+
       - uses: expo/expo-github-action@v8
         with:
           eas-version: latest
           packager: npm
           token: ${{ secrets.EXPO_TOKEN }}
-          
+
       - run: npm install
-      
+
       - run: eas init --account apdo35 --non-interactive
-      
+
       - name: Inject Android Package Name
         run: |
           node -e '
             const fs = require("fs");
-            let file = fs.existsSync("app.json") ? JSON.parse(fs.readFileSync("app.json")) : { expo: {} };
+            let file = fs.existsSync("app.json") ? JSON.parse(fs.readFileSync("app.json")) : {};
             if (!file.expo) file.expo = {};
             if (!file.expo.android) file.expo.android = {};
-            file.expo.android.package = "com.sanitalocation.app";
+            file.expo.android.package = "com.sanitalocation";
             fs.writeFileSync("app.json", JSON.stringify(file, null, 2));
           '
-      
+
       - run: eas build -p android --profile preview --non-interactive
