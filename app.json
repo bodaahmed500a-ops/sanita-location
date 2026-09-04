@@ -21,11 +21,6 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.bodaahmed500a.sanitalocation"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "ceaa5681-6ac9-4505-a4f2-6f213c8ce3d7"
-      }
     }
   }
 }
