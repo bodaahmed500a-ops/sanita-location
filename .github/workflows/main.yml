@@ -21,4 +21,8 @@ jobs:
       
       - run: eas init --account apdo35 --non-interactive
       
+      - name: Add android package name
+        run: |
+          npx jq '.expo.android.package = "com.sanitalocation.app"' app.json > app.json.tmp && mv app.json.tmp app.json
+      
       - run: eas build -p android --profile preview --non-interactive
