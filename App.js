@@ -1,194 +1,818 @@
-import React, { useState } from 'react';
-import { 
-  StyleSheet, Text, View, TextInput, FlatList, 
-  TouchableOpacity, Linking, SafeAreaView, StatusBar, Image 
-} from 'react-native';
+import React, { useMemo, useState } from "react";
+import {
+  Alert,
+  Linking,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-const LOGO_URL = 'https://i.ibb.co/1Yx9KCpr/IMG-5444.png';
+import MapView, { Marker } from "react-native-maps";
 
-const INITIAL_LOCATIONS = [
+const BLUE = "#0877C9";
+const DARK = "#123047";
+const LIGHT = "#F4F8FB";
+
+const companies = [
   {
-    id: '1',
-    name: 'ابن سينا فارما - مخزن القطامية الرئيسي',
-    company: 'ابن سينا فارما',
-    phone: '19048',
-    notes: 'استلام الأدوية والمستلزمات الطبية - التجمع / القطامية.',
-    mapsUrl: 'https://maps.google.com/?q=ابن+سينا+فارما+القطامية'
+    id: "1",
+    name: "Aramex",
+    type: "شحن دولي ومحلي",
+    city: "القاهرة",
+    phone: "16060",
+    latitude: 30.0444,
+    longitude: 31.2357,
   },
   {
-    id: '2',
-    name: 'ابن سينا فارما - فرع 6 أكتوبر',
-    company: 'ابن سينا فارما',
-    phone: '19048',
-    notes: 'المنطقة الصناعية - استلام وتوزيع الجيزة.',
-    mapsUrl: 'https://maps.google.com/?q=ابن+سينا+فارما+6+أكتوبر'
+    id: "2",
+    name: "DHL",
+    type: "شحن دولي",
+    city: "القاهرة",
+    phone: "16345",
+    latitude: 30.0626,
+    longitude: 31.2497,
   },
   {
-    id: '3',
-    name: 'ابن سينا فارما - فرع الإسكندرية',
-    company: 'ابن سينا فارما',
-    phone: '19048',
-    notes: 'مخزن التوزيع الرئيسي للوجه البحري.',
-    mapsUrl: 'https://maps.google.com/?q=ابن+سينا+فارما+الاسكندرية'
+    id: "3",
+    name: "Bosta",
+    type: "شحن داخلي",
+    city: "القاهرة",
+    phone: "15429",
+    latitude: 30.0131,
+    longitude: 31.2089,
   },
   {
-    id: '4',
-    name: 'أمازون مصر - المركز اللوجستي الرئيسي (الشروق)',
-    company: 'أمازون',
-    phone: '08000003886',
-    notes: 'دخول الشاحنات والنقل الثقيل من البوابة 2 الخلفية.',
-    mapsUrl: 'https://maps.google.com/?q=Amazon+FC+El+Shorouk'
+    id: "4",
+    name: "Amazon Egypt",
+    type: "تجارة وشحن",
+    city: "مصر",
+    latitude: 30.0444,
+    longitude: 31.2357,
   },
   {
-    id: '5',
-    name: 'أمازون مصر - مخزن العاشر من رمضان',
-    company: 'أمازون',
-    phone: '08000003886',
-    notes: 'المنطقة الصناعية A1 - تسليم البضائع الكبيرة.',
-    mapsUrl: 'https://maps.google.com/?q=Amazon+Warehouse+10th+of+Ramadan'
+    id: "5",
+    name: "UPS",
+    type: "شحن دولي",
+    city: "القاهرة",
+    latitude: 30.08,
+    longitude: 31.34,
   },
-  {
-    id: '6',
-    name: 'جوميا مصر - مخزن 6 أكتوبر الرئيسي',
-    company: 'جوميا',
-    phone: '15204',
-    notes: 'مواعيد استلام الموردين والسواقين من 8 ص حتى 4 ع.',
-    mapsUrl: 'https://maps.google.com/?q=Jumia+Warehouse+6th+October'
-  },
-  {
-    id: '7',
-    name: 'نون (noon) - مركز التجميع والتوزيع (أبو رواش)',
-    company: 'نون',
-    phone: '16086',
-    notes: 'المنطقة الصناعية أبو رواش - استلام شحنات Express.',
-    mapsUrl: 'https://maps.google.com/?q=noon+Hub+Abu+Rawash'
-  },
-  {
-    id: '8',
-    name: 'بي تك (B.TECH) - المركز اللوجستي (العاشر من رمضان)',
-    company: 'B.TECH',
-    phone: '19966',
-    notes: 'مخزن الأجهزة الكهربائية والألكترونيات.',
-    mapsUrl: 'https://maps.google.com/?q=B.TECH+Logistics+Center'
-  },
-  {
-    id: '9',
-    name: 'بوسطة (Bosta) - Hub المقطم الرئيسي',
-    company: 'بوسطة',
-    phone: '19036',
-    notes: 'تفرز وتسليم شحنات التجار لسائقي التوصيل.',
-    mapsUrl: 'https://maps.google.com/?q=Bosta+Mokattam+Hub'
-  },
-  {
-    id: '10',
-    name: 'أرامكس (Aramex) - مركز فرز ألاميل (العاشر من رمضان)',
-    company: 'أرامكس',
-    phone: '16991',
-    notes: 'شحن دولي ومحلي - بوابة الموردين والنقل الجماعي.',
-    mapsUrl: 'https://maps.google.com/?q=Aramex+10th+of+Ramadan'
-  },
-  {
-    id: '11',
-    name: 'مرسول مصر - فرع الدقي والتوزيع',
-    company: 'مرسول',
-    phone: '01000000000',
-    notes: 'مكتب استلام واستبدال أدوات وكباتن مرسول.',
-    mapsUrl: 'https://maps.google.com/?q=Mrsool+Egypt+Dokki'
-  },
-  {
-    id: '12',
-    name: 'شركة طرد (Tard) - مخزن مصر الجديدة',
-    company: 'طرد',
-    phone: '01200000000',
-    notes: 'تجميع الشحنات السريعة داخل القاهرة.',
-    mapsUrl: 'https://maps.google.com/?q=Tard+Express+Cairo'
-  }
 ];
 
+const initialRegion = {
+  latitude: 30.0444,
+  longitude: 31.2357,
+  latitudeDelta: 0.18,
+  longitudeDelta: 0.18,
+};
+
 export default function App() {
-  const [search, setSearch] = useState('');
+  const [screen, setScreen] = useState("home");
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [search, setSearch] = useState("");
 
-  const filteredLocations = INITIAL_LOCATIONS.filter(item => 
-    item.name.toLowerCase().includes(search.toLowerCase()) || 
-    item.company.toLowerCase().includes(search.toLowerCase()) ||
-    item.notes.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredCompanies = useMemo(() => {
+    const value = search.trim().toLowerCase();
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0F172A" />
-      
+    if (!value) return companies;
+
+    return companies.filter((company) =>
+      `${company.name} ${company.type} ${company.city}`
+        .toLowerCase()
+        .includes(value)
+    );
+  }, [search]);
+
+  const callCompany = async (phone) => {
+    if (!phone) {
+      Alert.alert("غير متاح", "لا يوجد رقم اتصال موثوق لهذه الشركة حاليًا.");
+      return;
+    }
+
+    const url = `tel:${phone}`;
+
+    try {
+      const supported = await Linking.canOpenURL(url);
+
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert("خطأ", "لا يمكن فتح تطبيق الاتصال على هذا الجهاز.");
+      }
+    } catch {
+      Alert.alert("خطأ", "حدثت مشكلة أثناء محاولة الاتصال.");
+    }
+  };
+
+  const openMaps = async (company) => {
+    const url =
+      `https://www.google.com/maps/search/?api=1` +
+      `&query=${company.latitude},${company.longitude}`;
+
+    try {
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert("خطأ", "تعذر فتح الخرائط.");
+    }
+  };
+
+  const openWhatsApp = async (phone) => {
+    if (!phone) {
+      Alert.alert(
+        "واتساب غير متاح",
+        "لا يوجد رقم واتساب رسمي موثوق لهذه الشركة حاليًا."
+      );
+      return;
+    }
+
+    const cleanPhone = phone.replace(/\D/g, "");
+    const url = `https://wa.me/20${cleanPhone.replace(/^20/, "")}`;
+
+    try {
+      const supported = await Linking.canOpenURL(url);
+
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert("خطأ", "تعذر فتح واتساب.");
+      }
+    } catch {
+      Alert.alert("خطأ", "حدثت مشكلة أثناء فتح واتساب.");
+    }
+  };
+
+  const showCompany = (company) => {
+    setSelectedCompany(company);
+    setScreen("company");
+  };
+
+  const Home = () => (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.header}>
-        <Image source={{ uri: LOGO_URL }} style={styles.logo} resizeMode="contain" />
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.title}>Sanita Location 🚚</Text>
-          <Text style={styles.subtitle}>دليل مخازن الشحن والملاحة للسواقين</Text>
+        <View>
+          <Text style={styles.logo}>SANITA</Text>
+          <Text style={styles.subtitle}>دليلك لخدمات الشحن</Text>
         </View>
+
+        <TouchableOpacity
+          style={styles.headerButton}
+          onPress={() => setScreen("companies")}
+        >
+          <Text style={styles.headerButtonText}>☰</Text>
+        </TouchableOpacity>
       </View>
 
-      <TextInput
-        style={styles.searchInput}
-        placeholder="🔍 ابحث بالشركة، المخزن، أو المنطقة..."
-        placeholderTextColor="#94A3B8"
-        value={search}
-        onChangeText={setSearch}
-      />
+      <View style={styles.searchBox}>
+        <Text style={styles.searchIcon}>⌕</Text>
 
-      <FlatList
-        data={filteredLocations}
-        keyExtractor={item => item.id}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.badge}>{item.company}</Text>
-            </View>
-            <Text style={styles.cardTitle}>{item.name}</Text>
-            <Text style={styles.notes}>📝 {item.notes}</Text>
+        <TextInput
+          value={search}
+          onChangeText={setSearch}
+          placeholder="ابحث عن شركة شحن..."
+          placeholderTextColor="#8A9AA8"
+          style={styles.searchInput}
+        />
+      </View>
 
-            <View style={styles.btnGroup}>
-              <TouchableOpacity style={[styles.btn, styles.mapBtn]} onPress={() => Linking.openURL(item.mapsUrl)}>
-                <Text style={styles.btnText}>🗺️ الخريطة</Text>
-              </TouchableOpacity>
+      <Text style={styles.sectionTitle}>شركات الشحن القريبة</Text>
 
-              <TouchableOpacity style={[styles.btn, styles.callBtn]} onPress={() => Linking.openURL(`tel:${item.phone}`)}>
-                <Text style={styles.btnText}>📞 اتصال</Text>
-              </TouchableOpacity>
+      <View style={styles.mapCard}>
+        <MapView
+          style={styles.map}
+          initialRegion={initialRegion}
+          showsUserLocation={false}
+        >
+          {filteredCompanies.map((company) => (
+            <Marker
+              key={company.id}
+              coordinate={{
+                latitude: company.latitude,
+                longitude: company.longitude,
+              }}
+              title={company.name}
+              description={company.type}
+              onCalloutPress={() => showCompany(company)}
+            />
+          ))}
+        </MapView>
+      </View>
 
-              <TouchableOpacity style={[styles.btn, styles.waBtn]} onPress={() => Linking.openURL(`https://wa.me/2${item.phone}`)}>
-                <Text style={styles.btnText}>💬 واتساب</Text>
-              </TouchableOpacity>
-            </View>
+      <Text style={styles.sectionTitle}>الشركات</Text>
+
+      {filteredCompanies.map((company) => (
+        <CompanyCard
+          key={company.id}
+          company={company}
+          onPress={() => showCompany(company)}
+          onCall={() => callCompany(company.phone)}
+          onWhatsApp={() => openWhatsApp(company.whatsapp)}
+        />
+      ))}
+
+      {filteredCompanies.length === 0 && (
+        <View style={styles.empty}>
+          <Text style={styles.emptyTitle}>لا توجد نتائج</Text>
+          <Text style={styles.emptyText}>
+            جرّب كتابة اسم شركة أو مدينة مختلفة.
+          </Text>
+        </View>
+      )}
+    </ScrollView>
+  );
+
+  const Companies = () => (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+    >
+      <View style={styles.pageHeader}>
+        <TouchableOpacity onPress={() => setScreen("home")}>
+          <Text style={styles.back}>‹</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.pageTitle}>شركات الشحن</Text>
+
+        <View style={{ width: 30 }} />
+      </View>
+
+      <View style={styles.searchBox}>
+        <Text style={styles.searchIcon}>⌕</Text>
+
+        <TextInput
+          value={search}
+          onChangeText={setSearch}
+          placeholder="ابحث عن شركة..."
+          placeholderTextColor="#8A9AA8"
+          style={styles.searchInput}
+        />
+      </View>
+
+      {filteredCompanies.map((company) => (
+        <CompanyCard
+          key={company.id}
+          company={company}
+          onPress={() => showCompany(company)}
+          onCall={() => callCompany(company.phone)}
+          onWhatsApp={() => openWhatsApp(company.whatsapp)}
+        />
+      ))}
+    </ScrollView>
+  );
+
+  const Company = () => {
+    if (!selectedCompany) return null;
+
+    return (
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+      >
+        <View style={styles.pageHeader}>
+          <TouchableOpacity onPress={() => setScreen("companies")}>
+            <Text style={styles.back}>‹</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.pageTitle}>تفاصيل الشركة</Text>
+
+          <View style={{ width: 30 }} />
+        </View>
+
+        <View style={styles.companyHero}>
+          <View style={styles.companyIcon}>
+            <Text style={styles.companyIconText}>
+              {selectedCompany.name.charAt(0)}
+            </Text>
           </View>
-        )}
-      />
 
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>جميع الحقوق محفوظة © 2026 | تطوير Sanita Location 🚀</Text>
+          <Text style={styles.companyName}>{selectedCompany.name}</Text>
+
+          <Text style={styles.companyType}>
+            {selectedCompany.type}
+          </Text>
+        </View>
+
+        <View style={styles.actionRow}>
+          <ActionButton
+            title="اتصال"
+            icon="☎"
+            onPress={() => callCompany(selectedCompany.phone)}
+          />
+
+          <ActionButton
+            title="واتساب"
+            icon="◉"
+            onPress={() => openWhatsApp(selectedCompany.whatsapp)}
+          />
+
+          <ActionButton
+            title="الاتجاهات"
+            icon="⌖"
+            onPress={() => openMaps(selectedCompany)}
+          />
+        </View>
+
+        <Text style={styles.sectionTitle}>الموقع</Text>
+
+        <View style={styles.mapCard}>
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: selectedCompany.latitude,
+              longitude: selectedCompany.longitude,
+              latitudeDelta: 0.03,
+              longitudeDelta: 0.03,
+            }}
+          >
+            <Marker
+              coordinate={{
+                latitude: selectedCompany.latitude,
+                longitude: selectedCompany.longitude,
+              }}
+              title={selectedCompany.name}
+            />
+          </MapView>
+        </View>
+
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={() => openMaps(selectedCompany)}
+        >
+          <Text style={styles.primaryButtonText}>
+            فتح الموقع في الخرائط
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <StatusBar barStyle="dark-content" />
+
+      {screen === "home" && <Home />}
+      {screen === "companies" && <Companies />}
+      {screen === "company" && <Company />}
+
+      <View style={styles.bottomNav}>
+        <NavButton
+          title="الرئيسية"
+          icon="⌂"
+          active={screen === "home"}
+          onPress={() => setScreen("home")}
+        />
+
+        <NavButton
+          title="الشركات"
+          icon="▣"
+          active={screen === "companies"}
+          onPress={() => setScreen("companies")}
+        />
+
+        <NavButton
+          title="الشحنة"
+          icon="□"
+          active={false}
+          onPress={() =>
+            Alert.alert(
+              "قريبًا",
+              "سنضيف نظام تتبع الشحنات الحقيقي في المرحلة التالية."
+            )
+          }
+        />
+
+        <NavButton
+          title="حسابي"
+          icon="♙"
+          active={false}
+          onPress={() =>
+            Alert.alert(
+              "قريبًا",
+              "سنضيف الحساب والسائق في المرحلة التالية."
+            )
+          }
+        />
       </View>
     </SafeAreaView>
   );
 }
 
+function CompanyCard({
+  company,
+  onPress,
+  onCall,
+  onWhatsApp,
+}) {
+  return (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
+      <View style={styles.cardTop}>
+        <View style={styles.companyIconSmall}>
+          <Text style={styles.companyIconSmallText}>
+            {company.name.charAt(0)}
+          </Text>
+        </View>
+
+        <View style={styles.cardInfo}>
+          <Text style={styles.cardName}>{company.name}</Text>
+          <Text style={styles.cardType}>{company.type}</Text>
+          <Text style={styles.cardCity}>📍 {company.city}</Text>
+        </View>
+      </View>
+
+      <View style={styles.cardActions}>
+        <TouchableOpacity
+          style={styles.smallButton}
+          onPress={(event) => {
+            event.stopPropagation();
+            onCall();
+          }}
+        >
+          <Text style={styles.smallButtonText}>☎ اتصال</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.smallButton}
+          onPress={(event) => {
+            event.stopPropagation();
+            onWhatsApp();
+          }}
+        >
+          <Text style={styles.smallButtonText}>واتساب</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.smallButton}
+          onPress={onPress}
+        >
+          <Text style={styles.smallButtonText}>التفاصيل</Text>
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+function ActionButton({ title, icon, onPress }) {
+  return (
+    <TouchableOpacity
+      style={styles.actionButton}
+      onPress={onPress}
+    >
+      <Text style={styles.actionIcon}>{icon}</Text>
+      <Text style={styles.actionText}>{title}</Text>
+    </TouchableOpacity>
+  );
+}
+
+function NavButton({ title, icon, active, onPress }) {
+  return (
+    <TouchableOpacity style={styles.navButton} onPress={onPress}>
+      <Text
+        style={[
+          styles.navIcon,
+          active && styles.navActive,
+        ]}
+      >
+        {icon}
+      </Text>
+
+      <Text
+        style={[
+          styles.navText,
+          active && styles.navActive,
+        ]}
+      >
+        {title}
+      </Text>
+    </TouchableOpacity>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0F172A', paddingHorizontal: 15, paddingTop: 10 },
-  header: { flexDirection: 'row-reverse', alignItems: 'center', marginVertical: 12, backgroundColor: '#1E293B', padding: 14, borderRadius: 16, gap: 12, borderWidth: 1, borderColor: '#334155' },
-  headerTextContainer: { flex: 1 },
-  logo: { width: 55, height: 55, borderRadius: 12, borderWidth: 1, borderColor: '#38BDF8' },
-  title: { fontSize: 21, fontWeight: 'bold', color: '#F8FAFC', textAlign: 'right' },
-  subtitle: { fontSize: 12, color: '#38BDF8', marginTop: 2, textAlign: 'right', fontWeight: '600' },
-  searchInput: { backgroundColor: '#1E293B', padding: 14, borderRadius: 12, fontSize: 14, marginBottom: 14, borderWidth: 1, borderColor: '#334155', color: '#F8FAFC', textAlign: 'right' },
-  card: { backgroundColor: '#1E293B', borderRadius: 16, padding: 16, marginBottom: 14, borderRightWidth: 5, borderRightColor: '#38BDF8', borderWidth: 1, borderColor: '#334155' },
-  cardHeader: { alignItems: 'flex-end', marginBottom: 6 },
-  badge: { backgroundColor: '#0284C7', color: '#FFFFFF', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, fontSize: 11, fontWeight: 'bold', overflow: 'hidden' },
-  cardTitle: { fontSize: 16, fontWeight: 'bold', color: '#F1F5F9', textAlign: 'right', marginTop: 2 },
-  notes: { fontSize: 13, color: '#94A3B8', marginVertical: 8, textAlign: 'right', lineHeight: 18 },
-  btnGroup: { flexDirection: 'row-reverse', justifyContent: 'space-between', marginTop: 8, gap: 8 },
-  btn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
-  mapBtn: { backgroundColor: '#16A34A' },
-  callBtn: { backgroundColor: '#2563EB' },
-  waBtn: { backgroundColor: '#059669' },
-  btnText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 12 },
-  footer: { paddingVertical: 12, alignItems: 'center', borderTopWidth: 1, borderTopColor: '#1E293B', marginTop: 5 },
-  footerText: { fontSize: 11, color: '#64748B', fontWeight: '600' }
+  safe: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
+
+  container: {
+    flex: 1,
+    backgroundColor: LIGHT,
+  },
+
+  content: {
+    padding: 18,
+    paddingBottom: 110,
+  },
+
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 18,
+  },
+
+  logo: {
+    fontSize: 28,
+    fontWeight: "900",
+    color: BLUE,
+    letterSpacing: 2,
+  },
+
+  subtitle: {
+    color: "#6F8290",
+    marginTop: 3,
+    fontSize: 13,
+  },
+
+  headerButton: {
+    width: 45,
+    height: 45,
+    borderRadius: 14,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  headerButtonText: {
+    fontSize: 24,
+    color: DARK,
+  },
+
+  searchBox: {
+    height: 52,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    marginBottom: 20,
+  },
+
+  searchIcon: {
+    fontSize: 25,
+    color: BLUE,
+    marginRight: 8,
+  },
+
+  searchInput: {
+    flex: 1,
+    textAlign: "right",
+    fontSize: 15,
+    color: DARK,
+  },
+
+  sectionTitle: {
+    fontSize: 19,
+    fontWeight: "800",
+    color: DARK,
+    textAlign: "right",
+    marginBottom: 12,
+    marginTop: 5,
+  },
+
+  mapCard: {
+    height: 260,
+    borderRadius: 20,
+    overflow: "hidden",
+    marginBottom: 22,
+    backgroundColor: "#DCEAF2",
+  },
+
+  map: {
+    flex: 1,
+  },
+
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    padding: 15,
+    marginBottom: 12,
+  },
+
+  cardTop: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  companyIconSmall: {
+    width: 55,
+    height: 55,
+    borderRadius: 16,
+    backgroundColor: "#E8F4FC",
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 12,
+  },
+
+  companyIconSmallText: {
+    color: BLUE,
+    fontSize: 24,
+    fontWeight: "900",
+  },
+
+  cardInfo: {
+    flex: 1,
+  },
+
+  cardName: {
+    textAlign: "right",
+    color: DARK,
+    fontSize: 17,
+    fontWeight: "800",
+  },
+
+  cardType: {
+    textAlign: "right",
+    color: "#687B88",
+    marginTop: 3,
+  },
+
+  cardCity: {
+    textAlign: "right",
+    color: "#80909B",
+    marginTop: 4,
+    fontSize: 12,
+  },
+
+  cardActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 14,
+    gap: 7,
+  },
+
+  smallButton: {
+    flex: 1,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: "#EDF7FD",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  smallButtonText: {
+    color: BLUE,
+    fontWeight: "700",
+    fontSize: 12,
+  },
+
+  empty: {
+    backgroundColor: "#FFFFFF",
+    padding: 25,
+    borderRadius: 18,
+    alignItems: "center",
+  },
+
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: DARK,
+  },
+
+  emptyText: {
+    color: "#71828D",
+    marginTop: 7,
+  },
+
+  pageHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+
+  back: {
+    fontSize: 38,
+    color: BLUE,
+    lineHeight: 38,
+  },
+
+  pageTitle: {
+    fontSize: 21,
+    fontWeight: "900",
+    color: DARK,
+  },
+
+  companyHero: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 22,
+    alignItems: "center",
+    padding: 25,
+    marginBottom: 15,
+  },
+
+  companyIcon: {
+    width: 82,
+    height: 82,
+    borderRadius: 24,
+    backgroundColor: "#E8F4FC",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+
+  companyIconText: {
+    color: BLUE,
+    fontSize: 34,
+    fontWeight: "900",
+  },
+
+  companyName: {
+    color: DARK,
+    fontSize: 25,
+    fontWeight: "900",
+  },
+
+  companyType: {
+    color: "#71828D",
+    marginTop: 5,
+  },
+
+  actionRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 22,
+  },
+
+  actionButton: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 15,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+
+  actionIcon: {
+    fontSize: 22,
+    color: BLUE,
+    marginBottom: 5,
+  },
+
+  actionText: {
+    color: DARK,
+    fontWeight: "700",
+    fontSize: 12,
+  },
+
+  primaryButton: {
+    height: 52,
+    backgroundColor: BLUE,
+    borderRadius: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 15,
+  },
+
+  primaryButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "800",
+  },
+
+  bottomNav: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 78,
+    backgroundColor: "#FFFFFF",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    borderTopWidth: 1,
+    borderTopColor: "#E7EEF2",
+  },
+
+  navButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 65,
+  },
+
+  navIcon: {
+    fontSize: 22,
+    color: "#82929D",
+    marginBottom: 3,
+  },
+
+  navText: {
+    fontSize: 11,
+    color: "#82929D",
+    fontWeight: "600",
+  },
+
+  navActive: {
+    color: BLUE,
+  },
 });
