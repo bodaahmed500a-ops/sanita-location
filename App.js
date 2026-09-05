@@ -170,10 +170,7 @@ export default function App() {
         Alert.alert("خطأ", "لا يمكن فتح تطبيق الاتصال.");
       }
     } catch {
-      Alert.alert(
-        "خطأ",
-        "حدثت مشكلة أثناء محاولة الاتصال."
-      );
+      Alert.alert("خطأ", "حدثت مشكلة أثناء محاولة الاتصال.");
     }
   };
 
@@ -234,10 +231,7 @@ export default function App() {
       <View style={styles.header}>
         <View>
           <Text style={styles.logo}>SANITA</Text>
-
-          <Text style={styles.subtitle}>
-            دليلك لخدمات الشحن
-          </Text>
+          <Text style={styles.subtitle}>دليلك لخدمات الشحن</Text>
         </View>
 
         <TouchableOpacity
@@ -315,9 +309,7 @@ export default function App() {
         )}
       </View>
 
-      <Text style={styles.sectionTitle}>
-        الشركات
-      </Text>
+      <Text style={styles.sectionTitle}>الشركات</Text>
 
       {filteredCompanies.map((company) => (
         <CompanyCard
@@ -331,9 +323,7 @@ export default function App() {
 
       {filteredCompanies.length === 0 && (
         <View style={styles.empty}>
-          <Text style={styles.emptyTitle}>
-            لا توجد نتائج
-          </Text>
+          <Text style={styles.emptyTitle}>لا توجد نتائج</Text>
 
           <Text style={styles.emptyText}>
             جرّب كتابة اسم شركة أو مدينة مختلفة.
@@ -349,15 +339,11 @@ export default function App() {
       contentContainerStyle={styles.content}
     >
       <View style={styles.pageHeader}>
-        <TouchableOpacity
-          onPress={() => setScreen("home")}
-        >
+        <TouchableOpacity onPress={() => setScreen("home")}>
           <Text style={styles.back}>‹</Text>
         </TouchableOpacity>
 
-        <Text style={styles.pageTitle}>
-          شركات الشحن
-        </Text>
+        <Text style={styles.pageTitle}>شركات الشحن</Text>
 
         <View style={{ width: 30 }} />
       </View>
@@ -395,15 +381,11 @@ export default function App() {
         contentContainerStyle={styles.content}
       >
         <View style={styles.pageHeader}>
-          <TouchableOpacity
-            onPress={() => setScreen("companies")}
-          >
+          <TouchableOpacity onPress={() => setScreen("companies")}>
             <Text style={styles.back}>‹</Text>
           </TouchableOpacity>
 
-          <Text style={styles.pageTitle}>
-            تفاصيل الشركة
-          </Text>
+          <Text style={styles.pageTitle}>تفاصيل الشركة</Text>
 
           <View style={{ width: 30 }} />
         </View>
@@ -428,9 +410,7 @@ export default function App() {
           <ActionButton
             title="اتصال"
             icon="☎"
-            onPress={() =>
-              callCompany(selectedCompany.phone)
-            }
+            onPress={() => callCompany(selectedCompany.phone)}
           />
 
           <ActionButton
@@ -442,15 +422,11 @@ export default function App() {
           <ActionButton
             title="الاتجاهات"
             icon="⌖"
-            onPress={() =>
-              openMaps(selectedCompany)
-            }
+            onPress={() => openMaps(selectedCompany)}
           />
         </View>
 
-        <Text style={styles.sectionTitle}>
-          الموقع
-        </Text>
+        <Text style={styles.sectionTitle}>الموقع</Text>
 
         <View style={styles.mapCard}>
           <MapView
@@ -589,9 +565,7 @@ function CompanyCard({
             onCall();
           }}
         >
-          <Text style={styles.smallButtonText}>
-            ☎ اتصال
-          </Text>
+          <Text style={styles.smallButtonText}>☎ اتصال</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -601,18 +575,14 @@ function CompanyCard({
             onWhatsApp();
           }}
         >
-          <Text style={styles.smallButtonText}>
-            واتساب
-          </Text>
+          <Text style={styles.smallButtonText}>واتساب</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.smallButton}
           onPress={onPress}
         >
-          <Text style={styles.smallButtonText}>
-            التفاصيل
-          </Text>
+          <Text style={styles.smallButtonText}>التفاصيل</Text>
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -627,9 +597,7 @@ function ActionButton({ title, icon, onPress }) {
     >
       <Text style={styles.actionIcon}>{icon}</Text>
 
-      <Text style={styles.actionText}>
-        {title}
-      </Text>
+      <Text style={styles.actionText}>{title}</Text>
     </TouchableOpacity>
   );
 }
