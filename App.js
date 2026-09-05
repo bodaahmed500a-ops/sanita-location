@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   Linking,
@@ -13,6 +13,7 @@ import {
 } from "react-native";
 
 import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
 
 const BLUE = "#0877C9";
 const DARK = "#123047";
@@ -77,6 +78,66 @@ export default function App() {
   const [screen, setScreen] = useState("home");
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [search, setSearch] = useState("");
+  const [userLocation, setUserLocation] = useState(null);
+  const [locationLoading, setLocationLoading] = useState(true);
+
+  const homeMapRef = useRef(null);
+
+  useEffect(() => {
+    getUserLocation();
+  }, []);
+
+  const getUserLocation = async () => {
+    try {
+      setLocationLoading(true);
+
+      const { status } =
+        await Location.requestForegroundPermissionsAsync();
+
+      if (status !== "granted") {
+        setLocationLoading(false);
+
+        Alert.alert(
+          "إذن الموقع",
+          "لم يتم السماح للتطبيق بالوصول إلى موقعك. يمكنك السماح بالموقع من إعدادات الهاتف."
+        );
+
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      const coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+
+      setUserLocation(coords);
+
+      setTimeout(() => {
+        if (homeMapRef.current) {
+          homeMapRef.current.animateToRegion(
+            {
+              latitude: coords.latitude,
+              longitude: coords.longitude,
+              latitudeDelta: 0.08,
+              longitudeDelta: 0.08,
+            },
+            1000
+          );
+        }
+      }, 500);
+    } catch (error) {
+      Alert.alert(
+        "خطأ في الموقع",
+        "لم نتمكن من الحصول على موقعك الحالي."
+      );
+    } finally {
+      setLocationLoading(false);
+    }
+  };
 
   const filteredCompanies = useMemo(() => {
     const value = search.trim().toLowerCase();
@@ -109,7 +170,10 @@ export default function App() {
         Alert.alert("خطأ", "لا يمكن فتح تطبيق الاتصال.");
       }
     } catch {
-      Alert.alert("خطأ", "حدثت مشكلة أثناء محاولة الاتصال.");
+      Alert.alert(
+        "خطأ",
+        "حدثت مشكلة أثناء محاولة الاتصال."
+      );
     }
   };
 
@@ -137,6 +201,30 @@ export default function App() {
     setScreen("company");
   };
 
+  const goToMyLocation = () => {
+    if (!userLocation) {
+      Alert.alert(
+        "الموقع",
+        "جاري الحصول على موقعك، حاول مرة أخرى بعد لحظات."
+      );
+
+      getUserLocation();
+      return;
+    }
+
+    if (homeMapRef.current) {
+      homeMapRef.current.animateToRegion(
+        {
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        },
+        800
+      );
+    }
+  };
+
   const Home = () => (
     <ScrollView
       style={styles.container}
@@ -146,6 +234,7 @@ export default function App() {
       <View style={styles.header}>
         <View>
           <Text style={styles.logo}>SANITA</Text>
+
           <Text style={styles.subtitle}>
             دليلك لخدمات الشحن
           </Text>
@@ -177,8 +266,12 @@ export default function App() {
 
       <View style={styles.mapCard}>
         <MapView
+          ref={homeMapRef}
           style={styles.map}
           initialRegion={initialRegion}
+          showsUserLocation={true}
+          showsMyLocationButton={false}
+          showsCompass={true}
         >
           {filteredCompanies.map((company) => (
             <Marker
@@ -192,10 +285,39 @@ export default function App() {
               onCalloutPress={() => showCompany(company)}
             />
           ))}
+
+          {userLocation && (
+            <Marker
+              coordinate={userLocation}
+              title="موقعك الحالي"
+              description="أنت هنا"
+            >
+              <View style={styles.userMarker}>
+                <View style={styles.userMarkerInner} />
+              </View>
+            </Marker>
+          )}
         </MapView>
+
+        <TouchableOpacity
+          style={styles.locationButton}
+          onPress={goToMyLocation}
+        >
+          <Text style={styles.locationButtonText}>⌖</Text>
+        </TouchableOpacity>
+
+        {locationLoading && (
+          <View style={styles.locationLoading}>
+            <Text style={styles.locationLoadingText}>
+              جاري تحديد موقعك...
+            </Text>
+          </View>
+        )}
       </View>
 
-      <Text style={styles.sectionTitle}>الشركات</Text>
+      <Text style={styles.sectionTitle}>
+        الشركات
+      </Text>
 
       {filteredCompanies.map((company) => (
         <CompanyCard
@@ -227,7 +349,9 @@ export default function App() {
       contentContainerStyle={styles.content}
     >
       <View style={styles.pageHeader}>
-        <TouchableOpacity onPress={() => setScreen("home")}>
+        <TouchableOpacity
+          onPress={() => setScreen("home")}
+        >
           <Text style={styles.back}>‹</Text>
         </TouchableOpacity>
 
@@ -345,6 +469,18 @@ export default function App() {
               }}
               title={selectedCompany.name}
             />
+
+            {userLocation && (
+              <Marker
+                coordinate={userLocation}
+                title="موقعك الحالي"
+                description="أنت هنا"
+              >
+                <View style={styles.userMarker}>
+                  <View style={styles.userMarkerInner} />
+                </View>
+              </Marker>
+            )}
           </MapView>
         </View>
 
@@ -490,7 +626,10 @@ function ActionButton({ title, icon, onPress }) {
       onPress={onPress}
     >
       <Text style={styles.actionIcon}>{icon}</Text>
-      <Text style={styles.actionText}>{title}</Text>
+
+      <Text style={styles.actionText}>
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -619,6 +758,68 @@ const styles = StyleSheet.create({
 
   map: {
     flex: 1,
+  },
+
+  locationButton: {
+    position: "absolute",
+    right: 12,
+    bottom: 12,
+    width: 45,
+    height: 45,
+    borderRadius: 14,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+  },
+
+  locationButtonText: {
+    color: BLUE,
+    fontSize: 27,
+    fontWeight: "900",
+  },
+
+  locationLoading: {
+    position: "absolute",
+    top: 12,
+    left: 12,
+    right: 12,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    paddingVertical: 8,
+    alignItems: "center",
+  },
+
+  locationLoadingText: {
+    color: DARK,
+    fontSize: 12,
+    fontWeight: "700",
+  },
+
+  userMarker: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "rgba(8, 119, 201, 0.25)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
+  },
+
+  userMarkerInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: BLUE,
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
   },
 
   card: {
