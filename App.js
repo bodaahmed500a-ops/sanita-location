@@ -51,6 +51,7 @@ const companies = [
     name: "Amazon Egypt",
     type: "تجارة وشحن",
     city: "مصر",
+    phone: null,
     latitude: 30.0444,
     longitude: 31.2357,
   },
@@ -59,6 +60,7 @@ const companies = [
     name: "UPS",
     type: "شحن دولي",
     city: "القاهرة",
+    phone: null,
     latitude: 30.08,
     longitude: 31.34,
   },
@@ -90,19 +92,21 @@ export default function App() {
 
   const callCompany = async (phone) => {
     if (!phone) {
-      Alert.alert("غير متاح", "لا يوجد رقم اتصال موثوق لهذه الشركة حاليًا.");
+      Alert.alert(
+        "غير متاح",
+        "لا يوجد رقم اتصال موثوق لهذه الشركة حاليًا."
+      );
       return;
     }
 
-    const url = `tel:${phone}`;
-
     try {
+      const url = `tel:${phone}`;
       const supported = await Linking.canOpenURL(url);
 
       if (supported) {
         await Linking.openURL(url);
       } else {
-        Alert.alert("خطأ", "لا يمكن فتح تطبيق الاتصال على هذا الجهاز.");
+        Alert.alert("خطأ", "لا يمكن فتح تطبيق الاتصال.");
       }
     } catch {
       Alert.alert("خطأ", "حدثت مشكلة أثناء محاولة الاتصال.");
@@ -121,29 +125,11 @@ export default function App() {
     }
   };
 
-  const openWhatsApp = async (phone) => {
-    if (!phone) {
-      Alert.alert(
-        "واتساب غير متاح",
-        "لا يوجد رقم واتساب رسمي موثوق لهذه الشركة حاليًا."
-      );
-      return;
-    }
-
-    const cleanPhone = phone.replace(/\D/g, "");
-    const url = `https://wa.me/20${cleanPhone.replace(/^20/, "")}`;
-
-    try {
-      const supported = await Linking.canOpenURL(url);
-
-      if (supported) {
-        await Linking.openURL(url);
-      } else {
-        Alert.alert("خطأ", "تعذر فتح واتساب.");
-      }
-    } catch {
-      Alert.alert("خطأ", "حدثت مشكلة أثناء فتح واتساب.");
-    }
+  const openWhatsApp = async () => {
+    Alert.alert(
+      "واتساب",
+      "سنضيف أرقام واتساب الرسمية للشركات بعد التأكد من بياناتها."
+    );
   };
 
   const showCompany = (company) => {
@@ -160,7 +146,9 @@ export default function App() {
       <View style={styles.header}>
         <View>
           <Text style={styles.logo}>SANITA</Text>
-          <Text style={styles.subtitle}>دليلك لخدمات الشحن</Text>
+          <Text style={styles.subtitle}>
+            دليلك لخدمات الشحن
+          </Text>
         </View>
 
         <TouchableOpacity
@@ -183,13 +171,14 @@ export default function App() {
         />
       </View>
 
-      <Text style={styles.sectionTitle}>شركات الشحن القريبة</Text>
+      <Text style={styles.sectionTitle}>
+        شركات الشحن القريبة
+      </Text>
 
       <View style={styles.mapCard}>
         <MapView
           style={styles.map}
           initialRegion={initialRegion}
-          showsUserLocation={false}
         >
           {filteredCompanies.map((company) => (
             <Marker
@@ -214,13 +203,16 @@ export default function App() {
           company={company}
           onPress={() => showCompany(company)}
           onCall={() => callCompany(company.phone)}
-          onWhatsApp={() => openWhatsApp(company.whatsapp)}
+          onWhatsApp={openWhatsApp}
         />
       ))}
 
       {filteredCompanies.length === 0 && (
         <View style={styles.empty}>
-          <Text style={styles.emptyTitle}>لا توجد نتائج</Text>
+          <Text style={styles.emptyTitle}>
+            لا توجد نتائج
+          </Text>
+
           <Text style={styles.emptyText}>
             جرّب كتابة اسم شركة أو مدينة مختلفة.
           </Text>
@@ -239,7 +231,9 @@ export default function App() {
           <Text style={styles.back}>‹</Text>
         </TouchableOpacity>
 
-        <Text style={styles.pageTitle}>شركات الشحن</Text>
+        <Text style={styles.pageTitle}>
+          شركات الشحن
+        </Text>
 
         <View style={{ width: 30 }} />
       </View>
@@ -262,7 +256,7 @@ export default function App() {
           company={company}
           onPress={() => showCompany(company)}
           onCall={() => callCompany(company.phone)}
-          onWhatsApp={() => openWhatsApp(company.whatsapp)}
+          onWhatsApp={openWhatsApp}
         />
       ))}
     </ScrollView>
@@ -277,11 +271,15 @@ export default function App() {
         contentContainerStyle={styles.content}
       >
         <View style={styles.pageHeader}>
-          <TouchableOpacity onPress={() => setScreen("companies")}>
+          <TouchableOpacity
+            onPress={() => setScreen("companies")}
+          >
             <Text style={styles.back}>‹</Text>
           </TouchableOpacity>
 
-          <Text style={styles.pageTitle}>تفاصيل الشركة</Text>
+          <Text style={styles.pageTitle}>
+            تفاصيل الشركة
+          </Text>
 
           <View style={{ width: 30 }} />
         </View>
@@ -293,7 +291,9 @@ export default function App() {
             </Text>
           </View>
 
-          <Text style={styles.companyName}>{selectedCompany.name}</Text>
+          <Text style={styles.companyName}>
+            {selectedCompany.name}
+          </Text>
 
           <Text style={styles.companyType}>
             {selectedCompany.type}
@@ -304,23 +304,29 @@ export default function App() {
           <ActionButton
             title="اتصال"
             icon="☎"
-            onPress={() => callCompany(selectedCompany.phone)}
+            onPress={() =>
+              callCompany(selectedCompany.phone)
+            }
           />
 
           <ActionButton
             title="واتساب"
             icon="◉"
-            onPress={() => openWhatsApp(selectedCompany.whatsapp)}
+            onPress={openWhatsApp}
           />
 
           <ActionButton
             title="الاتجاهات"
             icon="⌖"
-            onPress={() => openMaps(selectedCompany)}
+            onPress={() =>
+              openMaps(selectedCompany)
+            }
           />
         </View>
 
-        <Text style={styles.sectionTitle}>الموقع</Text>
+        <Text style={styles.sectionTitle}>
+          الموقع
+        </Text>
 
         <View style={styles.mapCard}>
           <MapView
@@ -384,7 +390,7 @@ export default function App() {
           onPress={() =>
             Alert.alert(
               "قريبًا",
-              "سنضيف نظام تتبع الشحنات الحقيقي في المرحلة التالية."
+              "سنضيف نظام تتبع الشحنات الحقيقي."
             )
           }
         />
@@ -396,7 +402,7 @@ export default function App() {
           onPress={() =>
             Alert.alert(
               "قريبًا",
-              "سنضيف الحساب والسائق في المرحلة التالية."
+              "سنضيف الحساب والسائق."
             )
           }
         />
@@ -425,9 +431,17 @@ function CompanyCard({
         </View>
 
         <View style={styles.cardInfo}>
-          <Text style={styles.cardName}>{company.name}</Text>
-          <Text style={styles.cardType}>{company.type}</Text>
-          <Text style={styles.cardCity}>📍 {company.city}</Text>
+          <Text style={styles.cardName}>
+            {company.name}
+          </Text>
+
+          <Text style={styles.cardType}>
+            {company.type}
+          </Text>
+
+          <Text style={styles.cardCity}>
+            📍 {company.city}
+          </Text>
         </View>
       </View>
 
@@ -439,7 +453,9 @@ function CompanyCard({
             onCall();
           }}
         >
-          <Text style={styles.smallButtonText}>☎ اتصال</Text>
+          <Text style={styles.smallButtonText}>
+            ☎ اتصال
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -449,14 +465,18 @@ function CompanyCard({
             onWhatsApp();
           }}
         >
-          <Text style={styles.smallButtonText}>واتساب</Text>
+          <Text style={styles.smallButtonText}>
+            واتساب
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.smallButton}
           onPress={onPress}
         >
-          <Text style={styles.smallButtonText}>التفاصيل</Text>
+          <Text style={styles.smallButtonText}>
+            التفاصيل
+          </Text>
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -475,9 +495,17 @@ function ActionButton({ title, icon, onPress }) {
   );
 }
 
-function NavButton({ title, icon, active, onPress }) {
+function NavButton({
+  title,
+  icon,
+  active,
+  onPress,
+}) {
   return (
-    <TouchableOpacity style={styles.navButton} onPress={onPress}>
+    <TouchableOpacity
+      style={styles.navButton}
+      onPress={onPress}
+    >
       <Text
         style={[
           styles.navIcon,
