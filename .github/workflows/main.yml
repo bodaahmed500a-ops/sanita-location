@@ -26,7 +26,7 @@ jobs:
             let file = fs.existsSync("app.json") ? JSON.parse(fs.readFileSync("app.json")) : {};
             if (!file.expo) file.expo = {};
             if (!file.expo.android) file.expo.android = {};
-            file.expo.android.package = "com.sanitalocation";
+            file.expo.android.package = "com.sanita.location";
             fs.writeFileSync("app.json", JSON.stringify(file, null, 2));
           '
 
