@@ -13,6 +13,11 @@
     },
     "android": {
       "package": "com.sanita.location"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "242a39af-e64f-4435-8b59-efd7af5b0961"
+      }
     }
   }
 }
