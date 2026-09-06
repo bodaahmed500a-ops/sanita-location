@@ -1,20 +1,18 @@
 {
-  "cli": {
-    "version": ">= 10.0.0"
-  },
-  "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal"
+  "expo": {
+    "name": "Sanita Logistics",
+    "slug": "sanita-location",
+    "version": "14.0.0",
+    "orientation": "portrait",
+    "icon": "https://i.ibb.co/1Yx9KCpr/IMG-5444.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "https://i.ibb.co/1Yx9KCpr/IMG-5444.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F172A"
     },
-    "preview": {
-      "android": {
-        "buildType": "apk"
-      }
-    },
-    "production": {}
-  },
-  "submit": {
-    "production": {}
+    "android": {
+      "package": "com.sanita.location"
+    }
   }
 }
