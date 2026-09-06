@@ -19,8 +19,6 @@ jobs:
 
       - run: npm install
 
-      - run: eas init --account apdo35 --non-interactive
-
       - name: Inject Android Package Name
         run: |
           node -e '
