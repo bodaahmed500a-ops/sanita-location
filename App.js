@@ -247,13 +247,13 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('locations');
   const [search, setSearch] = useState('');
   const [selectedCompany, setSelectedCompany] = useState('الكل');
-  
+   
   const [driverName, setDriverName] = useState('');
   const [shipmentNo, setShipmentNo] = useState('');
   const [meterNo, setMeterNo] = useState('');
   const [destination, setDestination] = useState('');
   const [clientPhone, setClientPhone] = useState('');
-  
+   
   const [savedShipments, setSavedShipments] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
@@ -391,7 +391,7 @@ export default function App() {
       clientPhone: clientPhone || DEFAULT_TARGET_WA,
       date: new Date().toLocaleString('ar-EG', { hour12: true })
     };
-    
+     
     const updatedList = [newShipment, ...savedShipments];
     setSavedShipments(updatedList);
     saveToStorage(updatedList);
@@ -422,7 +422,7 @@ export default function App() {
   const handleSendStatus = (s, statusType) => {
     const currentDateTime = new Date().toLocaleString('ar-EG', { hour12: true });
     const locationMapUrl = 'https://maps.google.com/?q=current+location';
-    
+     
     let targetNumber = s.clientPhone ? s.clientPhone.trim() : DEFAULT_TARGET_WA;
     let cleanPhone = targetNumber.replace(/[^0-9]/g, '');
     if (cleanPhone.startsWith('0')) {
@@ -449,7 +449,7 @@ export default function App() {
     }
 
     let reportText = `📋 [تقرير الشحنات النشطة - شركة سانيتا]\n📅 تاريخ التقرير: ${new Date().toLocaleString('ar-EG', { hour12: true })}\n-------------------\n`;
-    
+     
     savedShipments.forEach((s, index) => {
       reportText += `\n${index + 1}. السائق: ${s.driverName}\n📦 الشحنة: ${s.shipmentNo}\n📍 الوجهة: ${s.destination}\n${s.meterNo ? '⚡ العداد: ' + s.meterNo + '\n' : ''}-------------------`;
     });
@@ -478,7 +478,7 @@ export default function App() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.bg }]}>
       <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={theme.bg} />
-      
+       
       {!isOnline && (
         <View style={styles.offlineBanner}>
           <Text style={styles.offlineText}>⚠️ تنبيه: لا يوجد اتصال بالإنترنت حالياً</Text>
@@ -553,7 +553,7 @@ export default function App() {
                 <Text style={[styles.drawerSectionTitle, { color: '#38BDF8' }]}>🏢 معلومات الشركة والدعم</Text>
                 <Text style={[styles.drawerInfoText, { color: theme.textSub }]}>📧 بريد الشركة:</Text>
                 <Text style={[styles.drawerInfoValue, { color: theme.textMain }]}>{COMPANY_GMAIL}</Text>
-                
+                 
                 <View style={styles.drawerContactRow}>
                   <TouchableOpacity style={styles.drawerWaBtn} onPress={() => Linking.openURL(`https://wa.me/2${DEVELOPER_PHONE}`)}>
                     <Text style={styles.drawerBtnText}>💬 تواصل مع المطور (واتساب)</Text>
@@ -575,7 +575,7 @@ export default function App() {
           <View style={[styles.modalContent, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
             <Text style={styles.modalTitle}>🔑 تعيين الرمز السري</Text>
             <Text style={[styles.modalSub, { color: theme.textSub }]}>اكتب الرمز السري الجديد الذي تريده لحماية الشحنات:</Text>
-            
+             
             <TextInput
               style={[styles.modalInput, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]}
               placeholder="اكتب الرمز هنا..."
@@ -627,7 +627,7 @@ export default function App() {
           <View style={[styles.modalContent, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
             <Text style={styles.modalTitle}>🔐 إدخال الرمز السري</Text>
             <Text style={[styles.modalSub, { color: theme.textSub }]}>هذا القسم محمي، أدخل الرمز السري الخاص بك للمتابعة:</Text>
-            
+             
             <TextInput
               style={[styles.modalInput, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]}
               placeholder="الرمز السري..."
@@ -723,7 +723,7 @@ export default function App() {
 
           <View style={[styles.formContainer, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
             <Text style={styles.formSectionTitle}>تسجيل شحنة جديدة للسائق</Text>
-            
+             
             <TextInput
               style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]}
               placeholder="اسم السائق ثلاثي..."
@@ -819,86 +819,452 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  offlineBanner: { backgroundColor: '#EF4444', padding: 5, alignItems: 'center' },
-  offlineText: { color: '#FFF', fontWeight: 'bold', fontSize: 12 },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderBottomWidth: 1 },
-  menuBtn: { width: 40, height: 40, borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
-  headerTextContainer: { flex: 1, alignItems: 'center' },
-  title: { fontSize: 18, fontWeight: 'bold' },
-  subtitle: { fontSize: 10, color: '#94A3B8' },
-  logo: { width: 40, height: 40, borderRadius: 20 },
-  tabContainer: { flexDirection: 'row', borderBottomWidth: 1, height: 50 },
-  tabBtn: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  activeTabBtn: { borderBottomWidth: 3, borderBottomColor: '#38BDF8' },
-  tabText: { fontSize: 13, color: '#94A3B8', fontWeight: 'bold' },
-  activeTabText: { color: '#38BDF8' },
-  searchInput: { margin: 10, padding: 12, borderRadius: 8, borderWidth: 1, fontSize: 13 },
-  chipsRow: { paddingHorizontal: 10, alignItems: 'center' },
-  chip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1, marginRight: 8, height: 34, justifyContent: 'center' },
-  activeChip: { backgroundColor: '#0284C7', borderColor: '#0284C7' },
-  chipText: { fontSize: 12, fontWeight: 'bold' },
-  activeChipText: { color: '#FFF' },
-  card: { marginHorizontal: 10, marginBottom: 10, padding: 12, borderRadius: 10, borderWidth: 1 },
-  cardHeader: { flexDirection: 'row', marginBottom: 5 },
-  badge: { backgroundColor: '#0284C7', color: '#FFF', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, fontSize: 11, fontWeight: 'bold' },
-  cardTitle: { fontSize: 15, fontWeight: 'bold', marginBottom: 5 },
-  notes: { fontSize: 12, marginBottom: 10 },
-  btnGroup: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 },
-  btn: { flex: 1, paddingVertical: 8, borderRadius: 6, alignItems: 'center', marginHorizontal: 3 },
-  mapBtn: { backgroundColor: '#0284C7' },
-  callBtn: { backgroundColor: '#16A34A' },
-  waBtn: { backgroundColor: '#25D366' },
-  btnText: { color: '#FFF', fontSize: 11, fontWeight: 'bold' },
-  statsRow: { flexDirection: 'row', padding: 10 },
-  statBox: { flex: 1, padding: 12, borderRadius: 8, borderWidth: 1, alignItems: 'center', marginHorizontal: 5 },
-  statNumber: { fontSize: 18, fontWeight: 'bold', color: '#38BDF8' },
-  statLabel: { fontSize: 11, marginTop: 4 },
-  formContainer: { margin: 10, padding: 15, borderRadius: 10, borderWidth: 1 },
-  formSectionTitle: { fontSize: 14, fontWeight: 'bold', color: '#38BDF8', marginBottom: 10 },
-  input: { borderWidth: 1, borderRadius: 8, padding: 10, marginBottom: 10, fontSize: 13 },
-  submitBtn: { backgroundColor: '#16A34A', padding: 12, borderRadius: 8, alignItems: 'center', marginTop: 5 },
-  submitBtnText: { color: '#FFF', fontWeight: 'bold', fontSize: 13 },
-  rowBetweenContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 10, marginBottom: 5 },
-  exportAllBtn: { backgroundColor: '#0284C7', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6 },
-  exportAllBtnText: { color: '#FFF', fontSize: 11, fontWeight: 'bold' },
-  noDataText: { textAlign: 'center', marginTop: 20, fontSize: 13 },
-  savedCard: { marginHorizontal: 10, marginBottom: 10, padding: 12, borderRadius: 8, borderWidth: 1 },
-  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 },
-  savedDate: { fontSize: 10 },
-  savedDriver: { fontSize: 13, fontWeight: 'bold' },
-  savedDetails: { fontSize: 12, marginBottom: 3 },
-  savedPhone: { fontSize: 12, color: '#38BDF8', marginBottom: 8 },
-  statusButtonsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 },
-  arrivalBtn: { flex: 1, backgroundColor: '#16A34A', padding: 6, borderRadius: 6, alignItems: 'center', marginRight: 4 },
-  finishBtn: { flex: 1, backgroundColor: '#D97706', padding: 6, borderRadius: 6, alignItems: 'center', marginHorizontal: 4 },
-  deleteBtn: { flex: 1, backgroundColor: '#EF4444', padding: 6, borderRadius: 6, alignItems: 'center', marginLeft: 4 },
-  statusBtnText: { color: '#FFF', fontSize: 10, fontWeight: 'bold' },
-  drawerOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-start' },
-  drawerContent: { width: '80%', height: '100%', padding: 20 },
-  drawerHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  drawerTitle: { fontSize: 16, fontWeight: 'bold' },
-  settingItemRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1 },
-  settingLabel: { fontSize: 13, fontWeight: 'bold' },
-  settingSub: { fontSize: 10, color: '#94A3B8' },
-  changePinBtn: { backgroundColor: '#0284C7', padding: 10, borderRadius: 8, alignItems: 'center', marginVertical: 15 },
-  changePinBtnText: { color: '#FFF', fontWeight: 'bold', fontSize: 12 },
-  drawerSectionBox: { padding: 12, borderRadius: 8, borderWidth: 1, marginVertical: 15 },
-  drawerSectionTitle: { fontWeight: 'bold', fontSize: 12, marginBottom: 8 },
-  drawerInfoText: { fontSize: 11 },
-  drawerInfoValue: { fontSize: 12, fontWeight: 'bold', marginBottom: 10 },
-  drawerContactRow: { flexDirection: 'row', marginTop: 5 },
-  drawerWaBtn: { backgroundColor: '#25D366', padding: 8, borderRadius: 6, flex: 1, alignItems: 'center' },
-  drawerBtnText: { color: '#FFF', fontSize: 11, fontWeight: 'bold' },
-  closeDrawerBtn: { backgroundColor: '#EF4444', padding: 10, borderRadius: 8, alignItems: 'center', marginTop: 10 },
-  closeDrawerBtnText: { color: '#FFF', fontWeight: 'bold', fontSize: 12 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 },
-  modalContent: { width: '100%', maxWidth: 320, padding: 20, borderRadius: 12, borderWidth: 1 },
-  modalTitle: { fontSize: 16, fontWeight: 'bold', color: '#38BDF8', marginBottom: 8 },
-  modalSub: { fontSize: 12, marginBottom: 15 },
-  modalInput: { borderWidth: 1, borderRadius: 8, padding: 10, fontSize: 13, marginBottom: 15 },
-  modalBtnRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  modalCancelBtn: { flex: 1, padding: 10, borderRadius: 8, alignItems: 'center', marginRight: 5 },
-  modalConfirmBtn: { flex: 1, backgroundColor: '#0284C7', padding: 10, borderRadius: 8, alignItems: 'center', marginLeft: 5 },
-  modalBtnText: { fontWeight: 'bold', fontSize: 12, color: '#FFF' }
+  container: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingTop: 10,
+  },
+  offlineBanner: {
+    backgroundColor: '#EF4444',
+    padding: 6,
+    borderRadius: 6,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  offlineText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 10,
+  },
+  menuBtn: {
+    padding: 8,
+    borderRadius: 8,
+  },
+  headerTextContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  subtitle: {
+    fontSize: 10,
+    color: '#94A3B8',
+  },
+  logo: {
+    width: 35,
+    height: 35,
+    borderRadius: 6,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    borderRadius: 10,
+    borderWidth: 1,
+    marginBottom: 10,
+    overflow: 'hidden',
+  },
+  tabBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  activeTabBtn: {
+    backgroundColor: '#0284C7',
+  },
+  tabText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#94A3B8',
+  },
+  activeTabText: {
+    color: '#FFF',
+  },
+  searchInput: {
+    padding: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginBottom: 8,
+    fontSize: 13,
+    textAlign: 'right',
+  },
+  chipsRow: {
+    alignItems: 'center',
+    paddingRight: 4,
+  },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    marginRight: 6,
+  },
+  activeChip: {
+    backgroundColor: '#0284C7',
+    borderColor: '#0284C7',
+  },
+  chipText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  activeChipText: {
+    color: '#FFF',
+  },
+  card: {
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 10,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    marginBottom: 6,
+  },
+  badge: {
+    backgroundColor: '#0284C7',
+    color: '#FFF',
+    fontSize: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    overflow: 'hidden',
+    fontWeight: 'bold',
+  },
+  cardTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    textAlign: 'right',
+  },
+  notes: {
+    fontSize: 11,
+    marginBottom: 10,
+    textAlign: 'right',
+  },
+  btnGroup: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  btn: {
+    flex: 1,
+    paddingVertical: 6,
+    borderRadius: 6,
+    alignItems: 'center',
+    marginHorizontal: 2,
+  },
+  mapBtn: {
+    backgroundColor: '#0284C7',
+  },
+  callBtn: {
+    backgroundColor: '#16A34A',
+  },
+  waBtn: {
+    backgroundColor: '#25D366',
+  },
+  btnText: {
+    color: '#FFF',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  statBox: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: 'center',
+    marginHorizontal: 4,
+  },
+  statNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#38BDF8',
+  },
+  statLabel: {
+    fontSize: 11,
+  },
+  formContainer: {
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  formSectionTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#38BDF8',
+    marginBottom: 8,
+    textAlign: 'right',
+  },
+  input: {
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 8,
+    fontSize: 12,
+    textAlign: 'right',
+  },
+  submitBtn: {
+    backgroundColor: '#16A34A',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  submitBtnText: {
+    color: '#FFF',
+    fontSize: 13,
+    fontWeight: 'bold',
+  },
+  rowBetweenContainer: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 6,
+  },
+  exportAllBtn: {
+    backgroundColor: '#25D366',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  exportAllBtnText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  noDataText: {
+    textAlign: 'center',
+    fontSize: 12,
+    marginTop: 10,
+  },
+  savedCard: {
+    padding: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginBottom: 8,
+  },
+  rowBetween: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  savedDate: {
+    fontSize: 10,
+  },
+  savedDriver: {
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  savedDetails: {
+    fontSize: 11,
+    textAlign: 'right',
+    marginBottom: 2,
+  },
+  savedPhone: {
+    fontSize: 11,
+    color: '#38BDF8',
+    textAlign: 'right',
+    marginBottom: 8,
+  },
+  statusButtonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  arrivalBtn: {
+    backgroundColor: '#16A34A',
+    flex: 1,
+    padding: 6,
+    borderRadius: 6,
+    alignItems: 'center',
+    marginHorizontal: 2,
+  },
+  finishBtn: {
+    backgroundColor: '#D97706',
+    flex: 1,
+    padding: 6,
+    borderRadius: 6,
+    alignItems: 'center',
+    marginHorizontal: 2,
+  },
+  deleteBtn: {
+    backgroundColor: '#EF4444',
+    flex: 1,
+    padding: 6,
+    borderRadius: 6,
+    alignItems: 'center',
+    marginHorizontal: 2,
+  },
+  statusBtnText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  drawerOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+  },
+  drawerContent: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 16,
+    maxHeight: '80%',
+  },
+  drawerHeaderRow: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  drawerTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  settingItemRow: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+  },
+  settingLabel: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    textAlign: 'right',
+  },
+  settingSub: {
+    fontSize: 10,
+    textAlign: 'right',
+  },
+  changePinBtn: {
+    backgroundColor: '#0284C7',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  changePinBtnText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  drawerSectionBox: {
+    padding: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginTop: 10,
+  },
+  drawerSectionTitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginBottom: 6,
+    textAlign: 'right',
+  },
+  drawerInfoText: {
+    fontSize: 11,
+    textAlign: 'right',
+  },
+  drawerInfoValue: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    textAlign: 'right',
+    marginBottom: 8,
+  },
+  drawerContactRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  drawerWaBtn: {
+    backgroundColor: '#25D366',
+    padding: 8,
+    borderRadius: 6,
+    alignItems: 'center',
+    flex: 1,
+  },
+  drawerBtnText: {
+    color: '#FFF',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  closeDrawerBtn: {
+    backgroundColor: '#334155',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 14,
+  },
+  closeDrawerBtnText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    width: '100%',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'right',
+    marginBottom: 6,
+  },
+  modalSub: {
+    fontSize: 12,
+    textAlign: 'right',
+    marginBottom: 10,
+  },
+  modalInput: {
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 12,
+    fontSize: 14,
+    textAlign: 'right',
+  },
+  modalBtnRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalCancelBtn: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginLeft: 6,
+  },
+  modalConfirmBtn: {
+    flex: 1,
+    backgroundColor: '#16A34A',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginRight: 6,
+  },
+  modalBtnText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+  },
 });
