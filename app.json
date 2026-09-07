@@ -5,11 +5,6 @@
     "version": "14.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
-    "splash": {
-      "image": "https://i.ibb.co/1Y9kCXpr/IMG-5444.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0F172A"
-    },
     "android": {
       "package": "com.sanita.location"
     },
