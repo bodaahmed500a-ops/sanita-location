@@ -4,10 +4,9 @@
     "slug": "sanita5",
     "version": "14.0.0",
     "orientation": "portrait",
-    "icon": "https://i.ibb.co/1Yx9KCpr/IMG-5444.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "https://i.ibb.co/1Yx9KCpr/IMG-5444.png",
+      "image": "https://i.ibb.co/1Y9kCXpr/IMG-5444.png",
       "resizeMode": "contain",
       "backgroundColor": "#0F172A"
     },
