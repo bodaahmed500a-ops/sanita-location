@@ -30,6 +30,126 @@ const COMPANY_GMAIL = 'sanita.logistics.egypt@gmail.com';
 
 const INITIAL_LOCATIONS = [
   {
+    id: '29',
+    name: 'بريد فاست (BrdFast) - فرع مدينة نصر',
+    company: 'بريد فاست',
+    phone: '15978',
+    notes: 'مركز فرز وتوزيع طلبات السوبرماركت والتجارة السريعة - مدينة نصر.',
+    mapsUrl: 'https://maps.google.com/?q=Breadfast+Nasr+City'
+  },
+  {
+    id: '30',
+    name: 'بريد فاست (BrdFast) - فرع التجمع الخامس',
+    company: 'بريد فاست',
+    phone: '15978',
+    notes: 'محطة التوزيع واللوجستيات لخدمة التجمع والشروق.',
+    mapsUrl: 'https://maps.google.com/?q=Breadfast+New+Cairo'
+  },
+  {
+    id: '31',
+    name: 'بريد فاست (BrdFast) - فرع المعادي ومصر القديمة',
+    company: 'بريد فاست',
+    phone: '15978',
+    notes: 'تغطية مناطق المعادي، المقطم، ومصر القديمة.',
+    mapsUrl: 'https://maps.google.com/?q=Breadfast+Maadi'
+  },
+  {
+    id: '32',
+    name: 'بريد فاست (BrdFast) - فرع أكتوبر والشيخ زايد',
+    company: 'بريد فاست',
+    phone: '15978',
+    notes: 'المستودع الرئيسي لخدمة غرب القاهرة و6 أكتوبر.',
+    mapsUrl: 'https://maps.google.com/?q=Breadfast+October'
+  },
+  {
+    id: '33',
+    name: 'بريد فاست (BrdFast) - فرع الإسكندرية (سموحة)',
+    company: 'بريد فاست',
+    phone: '15978',
+    notes: 'مركز التوزيع الساحلي لمنتجات بريد فاست بالإسكندرية.',
+    mapsUrl: 'https://maps.google.com/?q=Breadfast+Alexandria'
+  },
+  {
+    id: '34',
+    name: 'تيمبرلاند / فيفث ستريت - مخزن التجمع',
+    company: 'براندات وملابس',
+    phone: '0225000000',
+    notes: 'استلام وتوزيع الملابس والمستلزمات العالمية.',
+    mapsUrl: 'https://maps.google.com/?q=Fifth+Street+Warehouse+New+Cairo'
+  },
+  {
+    id: '35',
+    name: 'كايرو كارت (CairoCart) - مخزن العبور',
+    company: 'كايرو كارت',
+    phone: '0226000000',
+    notes: 'منصة التجارة الإلكترونية - استلام شحنات الموردين.',
+    mapsUrl: 'https://maps.google.com/?q=CairoCart+Obour'
+  },
+  {
+    id: '36',
+    name: 'مستودع ريكتك (R-Tech Logistics) - أبو رواش',
+    company: 'لوجستيات متنوعة',
+    phone: '0235000000',
+    notes: 'خدمات التخزين والشحن السريع للشركات الناشئة.',
+    mapsUrl: 'https://maps.google.com/?q=RTech+Logistics+Abu+Rawash'
+  },
+  {
+    id: '37',
+    name: 'شركة سبيد لوجستيك (Speed Logistics) - المعادي',
+    company: 'سبيد لوجستيك',
+    phone: '0227000000',
+    notes: 'محطة تجميع وتوزيع طرود التجارة الإلكترونية.',
+    mapsUrl: 'https://maps.google.com/?q=Speed+Logistics+Maadi'
+  },
+  {
+    id: '38',
+    name: 'مستودعات جهينة - المركز الرئيسي (6 أكتوبر)',
+    company: 'جهينة',
+    phone: '16150',
+    notes: 'المنطقة الصناعية - استلام وتوريد المنتجات الغذائية.',
+    mapsUrl: 'https://maps.google.com/?q=Juhayna+Plant+6th+October'
+  },
+  {
+    id: '39',
+    name: 'مستودعات المراعي (Paskin) - أبو رواش',
+    company: 'المراعي',
+    phone: '19222',
+    notes: 'توزيع الأغذية ومنتجات الألبان.',
+    mapsUrl: 'https://maps.google.com/?q=Almarai+Abu+Rawash'
+  },
+  {
+    id: '40',
+    name: 'شركة إكسبريس شيب (Express Ship) - وسط البلد',
+    company: 'إكسبريس شيب',
+    phone: '0223000000',
+    notes: 'شحن وتوصيل الطرود الفورية للمتاجر.',
+    mapsUrl: 'https://maps.google.com/?q=Express+Ship+Downtown+Cairo'
+  },
+  {
+    id: '41',
+    name: 'مستودع شركة مراد للتجارة والتوزيع - المؤسسة',
+    company: 'توزيع عام',
+    phone: '0222000000',
+    notes: 'محطة توزيع شبرا الخيمة والمؤسسة.',
+    mapsUrl: 'https://maps.google.com/?q=Mostorod+Distribution+Hub'
+  },
+  {
+    id: '42',
+    name: 'شركة فاستل (Fastel Delivery) - الدقي',
+    company: 'فاستل',
+    phone: '0237000000',
+    notes: 'توصيل أوردرات المطاعم والمتاجر أونلاين.',
+    mapsUrl: 'https://maps.google.com/?q=Fastel+Dokki'
+  },
+  {
+    id: '43',
+    name: 'مخازن تريدر لخدمات الشحن - مدينة نصر',
+    company: 'تريدر',
+    phone: '0224000000',
+    notes: 'فرز وتسليم شحنات التجار لشركات الشحن.',
+    mapsUrl: 'https://maps.google.com/?q=Trader+Nasr+City'
+  },
+  {
     id: '1',
     name: 'مخزن الشايع (ستارباكس ومذركير) - العاشر من رمضان',
     company: 'الشايع',
@@ -257,6 +377,7 @@ const INITIAL_LOCATIONS = [
 
 const COMPANIES_LIST = [
   'الكل',
+  'بريد فاست',
   'الشايع',
   'سوفيكو',
   'طلبات',
@@ -274,6 +395,8 @@ const COMPANIES_LIST = [
   'مترو وخير زمان',
   'سبينس',
   'هومز مارت',
+  'جهينة',
+  'المراعي',
   'بنوك ومحطات'
 ];
 
@@ -509,7 +632,8 @@ export default function App() {
 
   const handleSendStatus = (s, statusType) => {
     const currentDateTime = new Date().toLocaleString('ar-EG', { hour12: true });
-    const locationMapUrl = 'https://maps.google.com/?q=current+location';
+    const locationMapUrl = `https://maps.google.com/?q=${encodeURIComponent(s.destination)}`;
+    
     let targetNumber = s.clientPhone ? s.clientPhone.trim() : DEFAULT_TARGET_WA;
     let cleanPhone = targetNumber.replace(/[^0-9]/g, '');
     if (cleanPhone.startsWith('0')) {
@@ -519,23 +643,22 @@ export default function App() {
     let message = '';
     if (statusType === 'arrival') {
       message =
-        `🟢 [إشعار وصول شحنة]\n` +
+        '🟢 [إشعار وصول للموقع]\n' +
         `👨‍✈️ السائق: ${s.driverName}\n` +
         `📦 رقم الشحنة: ${s.shipmentNo}\n` +
         `📍 الوجهة: ${s.destination}\n` +
-        `📦 الحالة: ${s.status || 'في الطريق'}\n` +
         `⏰ وقت الوصول: ${currentDateTime}\n` +
-        (s.smartETA ? `⏱️ وقت الوصول المتوقع (ETA): ${s.smartETA}\n` : '') +
-        `🗺️ موقع اللوكيشن الحالي:\n${locationMapUrl}`;
+        `🗺️ لوكيشن تواجد السائق ورسالة الوصول:\n${locationMapUrl}\n` +
+        '-------------------';
     } else {
       message =
-        `🔴 [إشعار إنهاء وتسليم شحنة]\n` +
+        '🔴 [إشعار إنهاء وتسليم الشحنة]\n' +
         `👨‍✈️ السائق: ${s.driverName}\n` +
         `📦 رقم الشحنة: ${s.shipmentNo}\n` +
         `📍 الوجهة: ${s.destination}\n` +
-        `📦 الحالة: ${s.status || 'تم التسليم'}\n` +
-        `🏁 وقت الخروج والانتهاء: ${currentDateTime}\n` +
-        `🗺️ موقع اللوكيشن الحالي:\n${locationMapUrl}`;
+        `🏁 وقت الانتهاء والتسليم: ${currentDateTime}\n` +
+        `🗺️ لوكيشن نقطة التسليم:\n${locationMapUrl}\n` +
+        '-------------------';
     }
 
     const url = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
@@ -551,20 +674,22 @@ export default function App() {
     }
 
     let reportText =
-      `📋 [تقرير الشحنات النشطة - شركة سانيتا]\n` +
+      '📋 [تقرير الشحنات النشطة - شركة سانيتا]\n' +
       `📅 تاريخ التقرير: ${new Date().toLocaleString('ar-EG', { hour12: true })}\n` +
-      `-------------------\n`;
+      '-------------------\n';
 
     savedShipments.forEach((s, index) => {
+      const locationMapUrl = `https://maps.google.com/?q=${encodeURIComponent(s.destination)}`;
       reportText +=
         `\n${index + 1}. السائق: ${s.driverName}\n` +
         `📦 الشحنة: ${s.shipmentNo}\n` +
         `📍 الوجهة: ${s.destination}\n` +
         `📦 الحالة: ${s.status || 'في الطريق'}\n` +
         (s.smartETA ? `⏱️ الـ ETA: ${s.smartETA}\n` : '') +
-        `${s.meterNo ? '⚡ العداد: ' + s.meterNo + '\n' : ''}` +
-        `${s.driverNotes ? '📝 ملاحظات السائق: ' + s.driverNotes + '\n' : ''}` +
-        `-------------------`;
+        (s.meterNo ? '⚡ العداد: ' + s.meterNo + '\n' : '') +
+        (s.driverNotes ? '📝 ملاحظات السائق: ' + s.driverNotes + '\n' : '') +
+        `🗺️ لوكيشن الوجهة:\n${locationMapUrl}\n` +
+        '-------------------';
     });
 
     let targetNumber = DEFAULT_TARGET_WA;
@@ -621,7 +746,6 @@ export default function App() {
         </View>
       )}
 
-      {/* الهيدر */}
       <View style={[styles.header, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
         <TouchableOpacity style={[styles.menuBtn, { backgroundColor: theme.inputBg }]} onPress={() => setMenuVisible(true)}>
           <Text style={{ fontSize: 20, color: theme.textMain }}>☰</Text>
@@ -635,7 +759,6 @@ export default function App() {
         <Image source={{ uri: LOGO_URL }} style={styles.logo} resizeMode="contain" />
       </View>
 
-      {/* شريط التنقل بين التبويبات */}
       <View style={[styles.tabBar, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
         <TouchableOpacity
           style={[styles.tabItem, activeTab === 'locations' && styles.activeTabItem]}
@@ -665,7 +788,6 @@ export default function App() {
         </TouchableOpacity>
       </View>
 
-      {/* المحتوى حسب التبويب النشط */}
       {activeTab === 'locations' && (
         <View style={styles.contentContainer}>
           <TextInput
@@ -768,7 +890,7 @@ export default function App() {
 
             <TextInput
               style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]}
-              placeholder="رقم هاتف العميل / المشرف (اختياري)..."
+              placeholder="رقم هاتف المشرف المسؤول..."
               placeholderTextColor={theme.textSub}
               keyboardType="phone-pad"
               value={clientPhone}
@@ -828,6 +950,7 @@ export default function App() {
 
               <Text style={[styles.shipmentDetail, { color: theme.textSub }]}>📦 رقم الشحنة: {item.shipmentNo}</Text>
               <Text style={[styles.shipmentDetail, { color: theme.textSub }]}>📍 الوجهة: {item.destination}</Text>
+              <Text style={[styles.shipmentDetail, { color: theme.textSub }]}>📞 هاتف المشرف: {item.clientPhone}</Text>
               {item.driverNotes ? <Text style={[styles.shipmentDetail, { color: theme.textSub }]}>📝 ملاحظات: {item.driverNotes}</Text> : null}
               <Text style={[styles.shipmentDate, { color: theme.textSub }]}>⏰ {item.date}</Text>
 
@@ -883,7 +1006,6 @@ export default function App() {
               )}
             </View>
 
-            {/* زر التواصل مع المطور */}
             <TouchableOpacity style={styles.devContactBtn} onPress={contactDeveloper}>
               <Text style={styles.devContactBtnText}>👨‍💻 تواصل مع المطور</Text>
             </TouchableOpacity>
@@ -911,7 +1033,6 @@ export default function App() {
         </ScrollView>
       )}
 
-      {/* مودال تغيير حالة الشحنة السريع */}
       <Modal visible={statusModalVisible} transparent={true} animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={[styles.menuContainer, { backgroundColor: theme.cardBg, minHeight: 220 }]}>
@@ -934,7 +1055,6 @@ export default function App() {
         </View>
       </Modal>
 
-      {/* مودال إدخال الرمز السري عند الدخول لقسم الشحنات */}
       <Modal visible={pinModalVisible} transparent={true} animationType="fade">
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalOverlay}>
           <View style={[styles.menuContainer, { backgroundColor: theme.cardBg, minHeight: 220 }]}>
@@ -952,13 +1072,12 @@ export default function App() {
               <Text style={styles.submitBtnText}>تحقق ودخول</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.closeMenuBtn, { marginTop: 10 }]} onPress={() => setPinModalVisible(false)}>
-              <Text style={{ color: '#FFF', fontWeight: 'bold' }}>إلغاء</Text>
+              <Text style={{ color: '#FFF', fontWeight: 'bold' }}>إغلاق</Text>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
       </Modal>
 
-      {/* مودال تعيين/تغيير الرمز السري الجديد (معدل لمنع تعليق الكيبورد) */}
       <Modal visible={pinSetupModal} transparent={true} animationType="fade">
         <KeyboardAvoidingView 
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
@@ -985,7 +1104,6 @@ export default function App() {
         </KeyboardAvoidingView>
       </Modal>
 
-      {/* قائمة الإعدادات الجانبية */}
       <Modal visible={menuVisible} transparent={true} animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={[styles.menuContainer, { backgroundColor: theme.cardBg }]}>
@@ -1001,7 +1119,6 @@ export default function App() {
               <Switch value={customPinEnabled} onValueChange={handleTogglePinFeature} />
             </View>
 
-            {/* زر تغيير كلمة السر */}
             <TouchableOpacity
               style={styles.changePinMenuBtn}
               onPress={() => {
