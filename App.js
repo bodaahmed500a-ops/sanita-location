@@ -3,1135 +3,763 @@ import {
   StyleSheet,
   Text,
   View,
-  TextInput,
-  FlatList,
+  ScrollView,
   TouchableOpacity,
-  Linking,
   SafeAreaView,
   StatusBar,
-  Image,
-  ScrollView,
-  Alert,
-  RefreshControl,
-  Modal,
   Switch,
-  Animated,
-  KeyboardAvoidingView,
-  Platform
+  TextInput,
+  Alert,
+  Modal,
+  Share,
+  Dimensions,
+  Linking
 } from 'react-native';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const LOGO_URL = 'https://i.ibb.co/1Y9xKCpr/IMG-5444.png';
-const DEVELOPER_PHONE = '01229431500';
-const DEFAULT_TARGET_WA = '01009669403';
-const COMPANY_GMAIL = 'sanita.logistics.egypt@gmail.com';
-
-const INITIAL_LOCATIONS = [
-  {
-    id: '29',
-    name: 'بريد فاست (BrdFast) - فرع مدينة نصر',
-    company: 'بريد فاست',
-    phone: '15978',
-    notes: 'مركز فرز وتوزيع طلبات السوبرماركت والتجارة السريعة - مدينة نصر.',
-    mapsUrl: 'https://maps.google.com/?q=Breadfast+Nasr+City'
-  },
-  {
-    id: '30',
-    name: 'بريد فاست (BrdFast) - فرع التجمع الخامس',
-    company: 'بريد فاست',
-    phone: '15978',
-    notes: 'محطة التوزيع واللوجستيات لخدمة التجمع والشروق.',
-    mapsUrl: 'https://maps.google.com/?q=Breadfast+New+Cairo'
-  },
-  {
-    id: '31',
-    name: 'بريد فاست (BrdFast) - فرع المعادي ومصر القديمة',
-    company: 'بريد فاست',
-    phone: '15978',
-    notes: 'تغطية مناطق المعادي، المقطم، ومصر القديمة.',
-    mapsUrl: 'https://maps.google.com/?q=Breadfast+Maadi'
-  },
-  {
-    id: '32',
-    name: 'بريد فاست (BrdFast) - فرع أكتوبر والشيخ زايد',
-    company: 'بريد فاست',
-    phone: '15978',
-    notes: 'المستودع الرئيسي لخدمة غرب القاهرة و6 أكتوبر.',
-    mapsUrl: 'https://maps.google.com/?q=Breadfast+October'
-  },
-  {
-    id: '33',
-    name: 'بريد فاست (BrdFast) - فرع الإسكندرية (سموحة)',
-    company: 'بريد فاست',
-    phone: '15978',
-    notes: 'مركز التوزيع الساحلي لمنتجات بريد فاست بالإسكندرية.',
-    mapsUrl: 'https://maps.google.com/?q=Breadfast+Alexandria'
-  },
-  {
-    id: '34',
-    name: 'تيمبرلاند / فيفث ستريت - مخزن التجمع',
-    company: 'براندات وملابس',
-    phone: '0225000000',
-    notes: 'استلام وتوزيع الملابس والمستلزمات العالمية.',
-    mapsUrl: 'https://maps.google.com/?q=Fifth+Street+Warehouse+New+Cairo'
-  },
-  {
-    id: '35',
-    name: 'كايرو كارت (CairoCart) - مخزن العبور',
-    company: 'كايرو كارت',
-    phone: '0226000000',
-    notes: 'منصة التجارة الإلكترونية - استلام شحنات الموردين.',
-    mapsUrl: 'https://maps.google.com/?q=CairoCart+Obour'
-  },
-  {
-    id: '36',
-    name: 'مستودع ريكتك (R-Tech Logistics) - أبو رواش',
-    company: 'لوجستيات متنوعة',
-    phone: '0235000000',
-    notes: 'خدمات التخزين والشحن السريع للشركات الناشئة.',
-    mapsUrl: 'https://maps.google.com/?q=RTech+Logistics+Abu+Rawash'
-  },
-  {
-    id: '37',
-    name: 'شركة سبيد لوجستيك (Speed Logistics) - المعادي',
-    company: 'سبيد لوجستيك',
-    phone: '0227000000',
-    notes: 'محطة تجميع وتوزيع طرود التجارة الإلكترونية.',
-    mapsUrl: 'https://maps.google.com/?q=Speed+Logistics+Maadi'
-  },
-  {
-    id: '38',
-    name: 'مستودعات جهينة - المركز الرئيسي (6 أكتوبر)',
-    company: 'جهينة',
-    phone: '16150',
-    notes: 'المنطقة الصناعية - استلام وتوريد المنتجات الغذائية.',
-    mapsUrl: 'https://maps.google.com/?q=Juhayna+Plant+6th+October'
-  },
-  {
-    id: '39',
-    name: 'مستودعات المراعي (Paskin) - أبو رواش',
-    company: 'المراعي',
-    phone: '19222',
-    notes: 'توزيع الأغذية ومنتجات الألبان.',
-    mapsUrl: 'https://maps.google.com/?q=Almarai+Abu+Rawash'
-  },
-  {
-    id: '40',
-    name: 'شركة إكسبريس شيب (Express Ship) - وسط البلد',
-    company: 'إكسبريس شيب',
-    phone: '0223000000',
-    notes: 'شحن وتوصيل الطرود الفورية للمتاجر.',
-    mapsUrl: 'https://maps.google.com/?q=Express+Ship+Downtown+Cairo'
-  },
-  {
-    id: '41',
-    name: 'مستودع شركة مراد للتجارة والتوزيع - المؤسسة',
-    company: 'توزيع عام',
-    phone: '0222000000',
-    notes: 'محطة توزيع شبرا الخيمة والمؤسسة.',
-    mapsUrl: 'https://maps.google.com/?q=Mostorod+Distribution+Hub'
-  },
-  {
-    id: '42',
-    name: 'شركة فاستل (Fastel Delivery) - الدقي',
-    company: 'فاستل',
-    phone: '0237000000',
-    notes: 'توصيل أوردرات المطاعم والمتاجر أونلاين.',
-    mapsUrl: 'https://maps.google.com/?q=Fastel+Dokki'
-  },
-  {
-    id: '43',
-    name: 'مخازن تريدر لخدمات الشحن - مدينة نصر',
-    company: 'تريدر',
-    phone: '0224000000',
-    notes: 'فرز وتسليم شحنات التجار لشركات الشحن.',
-    mapsUrl: 'https://maps.google.com/?q=Trader+Nasr+City'
-  },
-  {
-    id: '1',
-    name: 'مخزن الشايع (ستارباكس ومذركير) - العاشر من رمضان',
-    company: 'الشايع',
-    phone: '01000000001',
-    notes: 'المخزن الرئيسي لتوزيع منتجات ومستلزمات ستارباكس ومذركير - المنطقة الصناعية.',
-    mapsUrl: 'https://maps.google.com/?q=Alshaya+Warehouse+10th+of+Ramadan'
-  },
-  {
-    id: '2',
-    name: 'مخازن سوفيكو (Sofico) - مسطرد',
-    company: 'سوفيكو',
-    phone: '0223500000',
-    notes: 'مخازن التوزيع الكبرى بمسطرد - دخول سيارات النقل والتوزيع.',
-    mapsUrl: 'https://maps.google.com/?q=Sofico+Mostorod'
-  },
-  {
-    id: '3',
-    name: 'طلبات ديليفري (Talabat Hub) - مدينة نصر',
-    company: 'طلبات',
-    phone: '19912',
-    notes: 'مركز تجمع وتوزيع طلبات الأوردرات والكباتن.',
-    mapsUrl: 'https://maps.google.com/?q=Talabat+Hub+Nasr+City'
-  },
-  {
-    id: '4',
-    name: 'طلبات ديليفري - فرع الجيزة (الدقي)',
-    company: 'طلبات',
-    phone: '19912',
-    notes: 'محطة استعلام وتمركز دليفري الجيزة.',
-    mapsUrl: 'https://maps.google.com/?q=Talabat+Dokki'
-  },
-  {
-    id: '5',
-    name: 'ابن سينا فارما - مخزن القطامية الرئيسي',
-    company: 'ابن سينا فارما',
-    phone: '19048',
-    notes: 'استلام الأدوية والمستلزمات الطبية - التجمع / القطامية.',
-    mapsUrl: 'https://maps.google.com/?q=ابن+سينا+فارما+القطامية'
-  },
-  {
-    id: '6',
-    name: 'ابن سينا فارما - فرع 6 أكتوبر',
-    company: 'ابن سينا فارما',
-    phone: '19048',
-    notes: 'المنطقة الصناعية - استلام وتوزيع الجيزة.',
-    mapsUrl: 'https://maps.google.com/?q=ابن+سينا+فارما+6+أكتوبر'
-  },
-  {
-    id: '7',
-    name: 'أمازون مصر - المركز اللوجستي الرئيسي (الشروق)',
-    company: 'أمازون',
-    phone: '08000003886',
-    notes: 'دخول الشاحنات والنقل الثقيل من البوابة 2 الخلفية.',
-    mapsUrl: 'https://maps.google.com/?q=Amazon+FC+El+Shorouk'
-  },
-  {
-    id: '8',
-    name: 'أمازون مصر - مخزن العاشر من رمضان',
-    company: 'أمازون',
-    phone: '08000003886',
-    notes: 'المنطقة الصناعية A1 - تسليم البضائع الكبيرة.',
-    mapsUrl: 'https://maps.google.com/?q=Amazon+Warehouse+10th+of+Ramadan'
-  },
-  {
-    id: '9',
-    name: 'أمازون مصر - مخزن أبو رواش (الجيزة)',
-    company: 'أمازون',
-    phone: '08000003886',
-    notes: 'تغطية توصيل غرب القاهرة والجيزة.',
-    mapsUrl: 'https://maps.google.com/?q=Amazon+Abu+Rawash'
-  },
-  {
-    id: '10',
-    name: 'جوميا مصر - مخزن 6 أكتوبر الرئيسي',
-    company: 'جوميا',
-    phone: '15204',
-    notes: 'مواعيد استلام الموردين والسواقين من 8 ص حتى 4 ع.',
-    mapsUrl: 'https://maps.google.com/?q=Jumia+Warehouse+6th+October'
-  },
-  {
-    id: '11',
-    name: 'جوميا مصر - مركز تجمع المقطم',
-    company: 'جوميا',
-    phone: '15204',
-    notes: 'توزيع فرعي لمناطق وسط وجنوب القاهرة.',
-    mapsUrl: 'https://maps.google.com/?q=Jumia+Mokattam'
-  },
-  {
-    id: '12',
-    name: 'نون (noon) - مركز التجميع والتوزيع (أبو رواش)',
-    company: 'نون',
-    phone: '16086',
-    notes: 'المنطقة الصناعية أبو رواش - استلام شحنات Express.',
-    mapsUrl: 'https://maps.google.com/?q=noon+Hub+Abu+Rawash'
-  },
-  {
-    id: '13',
-    name: 'نون (noon) - مستودع العبور',
-    company: 'نون',
-    phone: '16086',
-    notes: 'مدينة العبور - الحي الصناعي الأول.',
-    mapsUrl: 'https://maps.google.com/?q=noon+Obour+Warehouse'
-  },
-  {
-    id: '14',
-    name: 'بي تك (B.TECH) - المركز اللوجستي (العاشر من رمضان)',
-    company: 'B.TECH',
-    phone: '19966',
-    notes: 'مخزن الأجهزة الكهربائية والألكترونيات.',
-    mapsUrl: 'https://maps.google.com/?q=B.TECH+Logistics+Center'
-  },
-  {
-    id: '15',
-    name: 'بوسطة (Bosta) - Hub المقطم الرئيسي',
-    company: 'بوسطة',
-    phone: '19036',
-    notes: 'فرز وتسليم شحنات التجار لسائقي التوصيل.',
-    mapsUrl: 'https://maps.google.com/?q=Bosta+Mokattam+Hub'
-  },
-  {
-    id: '16',
-    name: 'بوسطة (Bosta) - فرع الإسكندرية',
-    company: 'بوسطة',
-    phone: '19036',
-    notes: 'منطقة سموحة - مركز الفرز والتوزيع الساحلي.',
-    mapsUrl: 'https://maps.google.com/?q=Bosta+Alexandria'
-  },
-  {
-    id: '17',
-    name: 'أرامكس (Aramex) - مركز فرز العاشر من رمضان',
-    company: 'أرامكس',
-    phone: '16991',
-    notes: 'شحن دولي ومحلي - بوابة الموردين والنقل الجماعي.',
-    mapsUrl: 'https://maps.google.com/?q=Aramex+10th+of+Ramadan'
-  },
-  {
-    id: '18',
-    name: 'أرامكس (Aramex) - محطة المطار (القاهرة)',
-    company: 'أرامكس',
-    phone: '16991',
-    notes: 'شحن جوي وطرود دولية سريعة.',
-    mapsUrl: 'https://maps.google.com/?q=Aramex+Cairo+Airport'
-  },
-  {
-    id: '19',
-    name: 'مرسول مصر - فرع الدقي والتوزيع',
-    company: 'مرسول',
-    phone: '01000000000',
-    notes: 'مكتب استلام واستبدال أدوات وكباتن مرسول.',
-    mapsUrl: 'https://maps.google.com/?q=Mrsool+Egypt+Dokki'
-  },
-  {
-    id: '20',
-    name: 'تريدلاين (Tradeline) - المركز الرئيسي ومخزن القطامية',
-    company: 'تريدلاين',
-    phone: '19858',
-    notes: 'موزع منتجات أبل المعتمد - استلام بضائع الأجهزة.',
-    mapsUrl: 'https://maps.google.com/?q=Tradeline+Katameya'
-  },
-  {
-    id: '21',
-    name: 'راية شوب (Raya Shop) - مخزن أبو رواش',
-    company: 'راية',
-    phone: '19900',
-    notes: 'مخازن التجارة الإلكترونية والأجهزة.',
-    mapsUrl: 'https://maps.google.com/?q=Raya+Distribution+Abu+Rawash'
-  },
-  {
-    id: '22',
-    name: 'إل جي مصر (LG) - المخزن المركزي (العبور)',
-    company: 'إل جي',
-    phone: '19990',
-    notes: 'استلام الأجهزة المنزلية والشاشات.',
-    mapsUrl: 'https://maps.google.com/?q=LG+Warehouse+Obour'
-  },
-  {
-    id: '23',
-    name: 'مترو ماركت وكنوز (Metro & Kheir Zaman) - مخزن أبو رواش',
-    company: 'مترو وخير زمان',
-    phone: '19259',
-    notes: 'مخازن الأغذية والسلع الاستهلاكية.',
-    mapsUrl: 'https://maps.google.com/?q=Metro+Market+Warehouse+Abu+Rawash'
-  },
-  {
-    id: '24',
-    name: 'سبينس مصر (Spinneys) - مركز التوزيع الرئيسي (العبور)',
-    company: 'سبينس',
-    phone: '16005',
-    notes: 'تخزين وتوزيع الأغذية والمستلزمات.',
-    mapsUrl: 'https://maps.google.com/?q=Spinneys+Obour+Warehouse'
-  },
-  {
-    id: '25',
-    name: 'هومز مارت (Homzmart) - مخزن العاشر من رمضان',
-    company: 'هومز مارت',
-    phone: '0235380000',
-    notes: 'منصة أونلاين الأثاث والديكور - استلام الشاحنات.',
-    mapsUrl: 'https://maps.google.com/?q=Homzmart+Warehouse+10th+of+Ramadan'
-  },
-  {
-    id: '26',
-    name: 'البنك الأهلي المصري - مركز التحصيل والعمليات (القرية الذكية)',
-    company: 'بنوك ومحطات',
-    phone: '19623',
-    notes: 'إيداع وتحصيل الشحنات المالية والعهد.',
-    mapsUrl: 'https://maps.google.com/?q=National+Bank+of+Egypt+Smart+Village'
-  },
-  {
-    id: '27',
-    name: 'بنك مصر - مركز العمليات والخدمات (التجمع الخامس)',
-    company: 'بنوك ومحطات',
-    phone: '19888',
-    notes: 'استلام وتوريد عهد السائقين والشحنات المالية.',
-    mapsUrl: 'https://maps.google.com/?q=Banque+Misr+NewCairo'
-  },
-  {
-    id: '28',
-    name: 'محطة تحصيل فوري (Fawry Hub) - القرية الذكية',
-    company: 'بنوك ومحطات',
-    phone: '16421',
-    notes: 'محطة تسوية المدفوعات والخدمات المالية.',
-    mapsUrl: 'https://maps.google.com/?q=Fawry+Smart+Village'
-  }
-];
-
-const COMPANIES_LIST = [
-  'الكل',
-  'بريد فاست',
-  'الشايع',
-  'سوفيكو',
-  'طلبات',
-  'ابن سينا فارما',
-  'أمازون',
-  'جوميا',
-  'نون',
-  'B.TECH',
-  'بوسطة',
-  'أرامكس',
-  'مرسول',
-  'تريدلاين',
-  'راية',
-  'إل جي',
-  'مترو وخير زمان',
-  'سبينس',
-  'هومز مارت',
-  'جهينة',
-  'المراعي',
-  'بنوك ومحطات'
-];
+const { width, height } = Dimensions.get('window');
 
 export default function App() {
-  const [isSplashVisible, setIsSplashVisible] = useState(true);
-  const fadeAnim = useState(new Animated.Value(1))[0];
-
-  const [activeTab, setActiveTab] = useState('locations');
-  const [search, setSearch] = useState('');
-  const [selectedCompany, setSelectedCompany] = useState('الكل');
-
-  const [driverName, setDriverName] = useState('');
-  const [shipmentNo, setShipmentNo] = useState('');
-  const [meterNo, setMeterNo] = useState('');
-  const [destination, setDestination] = useState('');
-  const [clientPhone, setClientPhone] = useState('');
-  const [shipmentNotes, setShipmentNotes] = useState('');
-  const [shipmentStatus, setShipmentStatus] = useState('في الطريق');
-
-  const [savedShipments, setSavedShipments] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [isOnline, setIsOnline] = useState(true);
-
-  const [isAuthorized, setIsAuthorized] = useState(true);
-  const [pinModalVisible, setPinModalVisible] = useState(false);
-  const [enteredPin, setEnteredPin] = useState('');
-
-  const [customPinEnabled, setCustomPinEnabled] = useState(false);
-  const [customPin, setCustomPin] = useState('1234');
-  const [pinSetupModal, setPinSetupModal] = useState(false);
-  const [tempNewPin, setTempNewPin] = useState('');
-
-  const [menuVisible, setMenuVisible] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  
+  // حالة شاشة الترحيب
+  const [showWelcome, setShowWelcome] = useState(true);
 
-  const [statusModalVisible, setStatusModalVisible] = useState(false);
-  const [selectedShipment, setSelectedShipment] = useState(null);
+  const [activeTab, setActiveTab] = useState('finance'); 
+  
+  // 1. الخزنة والحسابات
+  const [transactions, setTransactions] = useState([]);
+  const [totalIncome, setTotalIncome] = useState(0);
+  const [totalExpense, setTotalExpense] = useState(0);
+  const [amountInput, setAmountInput] = useState('');
+  const [noteInput, setNoteInput] = useState('');
+  const [financeSearch, setFinanceSearch] = useState('');
 
-  const [showUnderEditNotice, setShowUnderEditNotice] = useState(false);
+  // 2. العملاء
+  const [customers, setCustomers] = useState([]);
+  const [clientName, setClientName] = useState('');
+  const [clientPhone, setClientPhone] = useState('');
+  const [clientDue, setClientDue] = useState('');
+  const [customerSearch, setCustomerSearch] = useState('');
 
+  // 3. المخازن
+  const [products, setProducts] = useState([]);
+  const [prodName, setProdName] = useState('');
+  const [prodPrice, setProdPrice] = useState('');
+  const [prodQty, setProdQty] = useState('');
+  const [prodEmoji, setProdEmoji] = useState('');
+  const [productSearch, setProductSearch] = useState('');
+  const [lowStockFilter, setLowStockFilter] = useState(false);
+
+  // 4. الموظفين
+  const [employees, setEmployees] = useState([]);
+  const [empName, setEmpName] = useState('');
+  const [empSalary, setEmpSalary] = useState('');
+  const [empPhone, setEmpPhone] = useState('');
+
+  // حالات نافذة التعديل
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editingType, setEditingType] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editField1, setEditField1] = useState('');
+  const [editField2, setEditField2] = useState('');
+  const [editField3, setEditField3] = useState('');
+  const [editEmoji, setEditEmoji] = useState('');
+
+  // تحميل البيانات المحفوظة
   useEffect(() => {
     loadStoredData();
-    const timer = setTimeout(() => {
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true,
-      }).start(() => {
-        setIsSplashVisible(false);
-      });
-    }, 2500);
-    return () => clearTimeout(timer);
   }, []);
+
+  // حفظ البيانات تلقائياً
+  useEffect(() => {
+    saveDataToDevice();
+  }, [totalIncome, totalExpense, transactions, customers, products, employees]);
 
   const loadStoredData = async () => {
     try {
-      const stored = await AsyncStorage.getItem('@sanita_shipments_v15');
-      if (stored !== null) {
-        setSavedShipments(JSON.parse(stored));
-      }
-      const themeStored = await AsyncStorage.getItem('@sanita_theme');
-      if (themeStored !== null) {
-        setIsDarkMode(JSON.parse(themeStored));
-      }
-      const pinEnabledStored = await AsyncStorage.getItem('@sanita_pin_enabled');
-      if (pinEnabledStored !== null) {
-        const enabled = JSON.parse(pinEnabledStored);
-        setCustomPinEnabled(enabled);
-        if (enabled) {
-          setIsAuthorized(false);
+      const storedIncome = await AsyncStorage.getItem('@total_income');
+      const storedExpense = await AsyncStorage.getItem('@total_expense');
+      const storedTransactions = await AsyncStorage.getItem('@transactions_list');
+      const storedCustomers = await AsyncStorage.getItem('@customers_list');
+      const storedProducts = await AsyncStorage.getItem('@products_list');
+      const storedEmployees = await AsyncStorage.getItem('@employees_list');
+
+      if (storedIncome !== null) setTotalIncome(parseFloat(storedIncome));
+      if (storedExpense !== null) setTotalExpense(parseFloat(storedExpense));
+      if (storedTransactions !== null) setTransactions(JSON.parse(storedTransactions));
+      if (storedCustomers !== null) setCustomers(JSON.parse(storedCustomers));
+      if (storedProducts !== null) setProducts(JSON.parse(storedProducts));
+      if (storedEmployees !== null) setEmployees(JSON.parse(storedEmployees));
+    } catch (error) {
+      console.log('خطأ في استرجاع البيانات:', error);
+    }
+  };
+
+  const saveDataToDevice = async () => {
+    try {
+      await AsyncStorage.setItem('@total_income', totalIncome.toString());
+      await AsyncStorage.setItem('@total_expense', totalExpense.toString());
+      await AsyncStorage.setItem('@transactions_list', JSON.stringify(transactions));
+      await AsyncStorage.setItem('@customers_list', JSON.stringify(customers));
+      await AsyncStorage.setItem('@products_list', JSON.stringify(products));
+      await AsyncStorage.setItem('@employees_list', JSON.stringify(employees));
+    } catch (error) {
+      console.log('خطأ في حفظ البيانات:', error);
+    }
+  };
+
+  // فتح الواتساب بدون إظهار الرقم صراحة
+  const handleOpenWhatsApp = () => {
+    const phoneNumber = '+201229431500';
+    const message = 'السلام عليكم يا مهندس سيد، كنت أستفسر بخصوص تطبيق مدير الأعمال الشامل... 🚀';
+    const url = `whatsapp://send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+    
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (!supported) {
+          Alert.alert('تنبيه', 'تطبيق الواتساب غير مثبت على هذا الجهاز');
+        } else {
+          return Linking.openURL(url);
         }
-      }
-      const pinStored = await AsyncStorage.getItem('@sanita_custom_pin');
-      if (pinStored !== null) {
-        setCustomPin(pinStored);
-      }
-    } catch (e) {
-      console.log('Error loading data', e);
+      })
+      .catch((err) => console.error('An error occurred', err));
+  };
+
+  // تصفير كل البيانات
+  const handleResetAllData = () => {
+    Alert.alert(
+      '⚠️ تحذير خطير',
+      'هل أنت متأكد من رغبتك في حذف وتصفير جميع بيانات التطبيق؟',
+      [
+        { text: 'إلغاء', style: 'cancel' },
+        { 
+          text: 'نعم، امسح الكل', 
+          style: 'destructive', 
+          onPress: async () => {
+            try {
+              await AsyncStorage.clear();
+              setTotalIncome(0);
+              setTotalExpense(0);
+              setTransactions([]);
+              setCustomers([]);
+              setProducts([]);
+              setEmployees([]);
+              Alert.alert('تم بنجاح', 'تم تصفير التطبيق والبدء من جديد 🔄');
+            } catch (error) {
+              Alert.alert('خطأ', 'حدث خطأ أثناء مسح البيانات');
+            }
+          } 
+        }
+      ]
+    );
+  };
+
+  const openEditModal = (type, item) => {
+    setEditingType(type);
+    setEditingId(item.id);
+    if (type === 'customer') {
+      setEditField1(item.name);
+      setEditField2(item.phone);
+      setEditField3(item.totalDue);
+    } else if (type === 'product') {
+      setEditField1(item.name);
+      setEditField2(item.price);
+      setEditField3(item.qty);
+      setEditEmoji(item.emoji || '📦');
+    } else if (type === 'employee') {
+      setEditField1(item.name);
+      setEditField2(item.salary);
+      setEditField3(item.phone);
     }
+    setEditModalVisible(true);
   };
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await loadStoredData();
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 800);
-  };
-
-  const saveToStorage = async (newList) => {
-    try {
-      await AsyncStorage.setItem('@sanita_shipments_v15', JSON.stringify(newList));
-    } catch (e) {}
-  };
-
-  const toggleTheme = async (value) => {
-    setIsDarkMode(value);
-    try {
-      await AsyncStorage.setItem('@sanita_theme', JSON.stringify(value));
-    } catch (e) {}
-  };
-
-  const handleTabPress = (tabName) => {
-    if (tabName === 'driver' && customPinEnabled && !isAuthorized) {
-      setPinModalVisible(true);
-    } else {
-      setActiveTab(tabName);
-    }
-  };
-
-  const verifyPin = () => {
-    if (enteredPin === customPin) {
-      setIsAuthorized(true);
-      setPinModalVisible(false);
-      setEnteredPin('');
-      setActiveTab('driver');
-    } else {
-      Alert.alert('خطأ', 'الرمز السري غير صحيح!');
-      setEnteredPin('');
-    }
-  };
-
-  const handleTogglePinFeature = async (val) => {
-    setCustomPinEnabled(val);
-    try {
-      await AsyncStorage.setItem('@sanita_pin_enabled', JSON.stringify(val));
-      if (val) {
-        setMenuVisible(false);
-        setPinSetupModal(true);
-      } else {
-        setIsAuthorized(true);
-      }
-    } catch (e) {}
-  };
-
-  const saveNewCustomPin = async () => {
-    if (!tempNewPin || tempNewPin.length < 3) {
-      Alert.alert('تنبيه', 'برجاء إدخال رمز سري مكون من 3 أرقام على الأقل');
+  const handleSaveEdit = () => {
+    if (!editField1) {
+      Alert.alert('تنبيه', 'هذا الحقل أساسي ولا يمكن تركه فارغاً');
       return;
     }
-    setCustomPin(tempNewPin);
-    try {
-      await AsyncStorage.setItem('@sanita_custom_pin', tempNewPin);
-      setPinSetupModal(false);
-      setTempNewPin('');
-      Alert.alert('نجاح', 'تم حفظ وتحديث الرمز السري بنجاح 🔒');
-    } catch (e) {}
+
+    if (editingType === 'customer') {
+      setCustomers(customers.map(c => c.id === editingId ? { ...c, name: editField1, phone: editField2, totalDue: editField3 || '0' } : c));
+    } else if (editingType === 'product') {
+      setProducts(products.map(p => p.id === editingId ? { ...p, name: editField1, price: editField2, qty: editField3, emoji: editEmoji || '📦' } : p));
+    } else if (editingType === 'employee') {
+      setEmployees(employees.map(e => e.id === editingId ? { ...e, name: editField1, salary: editField2, phone: editField3 || 'غير محدد' } : e));
+    }
+
+    setEditModalVisible(false);
+    Alert.alert('تم التعديل', 'تم تحديث البيانات بنجاح ✅');
   };
 
-  const filteredLocations = INITIAL_LOCATIONS.filter(item => {
-    const matchesSearch =
-      item.name.toLowerCase().includes(search.toLowerCase()) ||
-      item.company.toLowerCase().includes(search.toLowerCase()) ||
-      item.notes.toLowerCase().includes(search.toLowerCase());
+  const handleShareReport = async () => {
+    try {
+      const lowStockCount = products.filter(p => parseInt(p.qty || 0) <= 5).length;
+      const reportText = `📊 تقرير مدير الأعمال الشامل:\n` +
+        `------------------------------------\n` +
+        `💰 صافي الخزنة: ${netBalance} ج.م\n` +
+        `👥 إجمالي ديون العملاء: ${totalCustomerDue} ج.م\n` +
+        `📦 إجمالي بضاعة المخزن: ${products.length} منتج (منها ${lowStockCount} منخفض)\n` +
+        `👨‍💼 إجمالي الرواتب: ${totalSalaries} ج.م\n` +
+        `------------------------------------\n` +
+        `تم الاستخراج عبر تطبيق مدير الأعمال 🚀`;
 
-    const matchesCompany = selectedCompany === 'الكل' || item.company === selectedCompany;
-    return matchesSearch && matchesCompany;
+      await Share.share({ message: reportText });
+    } catch (error) {
+      Alert.alert('خطأ', 'حدث خطأ أثناء مشاركة التقرير');
+    }
+  };
+
+  const netBalance = totalIncome - totalExpense;
+  const totalCustomerDue = customers.reduce((sum, item) => sum + parseFloat(item.totalDue || 0), 0);
+  const totalInventoryVal = products.reduce((sum, item) => sum + (parseFloat(item.price || 0) * parseInt(item.qty || 0)), 0);
+  const totalSalaries = employees.reduce((sum, item) => sum + parseFloat(item.salary || 0), 0);
+
+  const filteredTransactions = transactions.filter(t => t.note.toLowerCase().includes(financeSearch.toLowerCase()));
+  const filteredCustomers = customers.filter(c => c.name.toLowerCase().includes(customerSearch.toLowerCase()));
+  
+  const filteredProducts = products.filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(productSearch.toLowerCase());
+    const isLowStock = parseInt(p.qty || 0) <= 5;
+    if (lowStockFilter) {
+      return matchesSearch && isLowStock;
+    }
+    return matchesSearch;
   });
 
-  const handleAddShipment = () => {
-    if (!driverName || !destination) {
-      Alert.alert('تنبيه', 'برجاء ملء اسم السائق والوجهة على الأقل لحفظ الشحنة');
-      return;
-    }
-
-    const etaDate = new Date(Date.now() + 60 * 60 * 1000).toLocaleString('ar-EG', {
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true
-    });
-
-    const newShipment = {
-      id: Date.now().toString(),
-      driverName,
-      shipmentNo: shipmentNo ? shipmentNo.trim() : 'غير محدد',
-      meterNo: meterNo ? meterNo.trim() : '',
-      destination,
-      clientPhone: clientPhone || DEFAULT_TARGET_WA,
-      status: shipmentStatus,
-      driverNotes: shipmentNotes ? shipmentNotes.trim() : '',
-      deliveryProof: false,
-      deliveryProofDate: '',
-      date: new Date().toLocaleString('ar-EG', { hour12: true }),
-      smartETA: `اليوم، ${etaDate}`
-    };
-
-    const updatedList = [newShipment, ...savedShipments];
-    setSavedShipments(updatedList);
-    saveToStorage(updatedList);
-
-    setDriverName('');
-    setShipmentNo('');
-    setMeterNo('');
-    setDestination('');
-    setClientPhone('');
-    setShipmentNotes('');
-    setShipmentStatus('في الطريق');
-
-    Alert.alert('نجاح', 'تم حفظ الشحنة وتثبيتها بنجاح 🚀');
+  const theme = {
+    bg: isDarkMode ? '#07090E' : '#F1F5F9',
+    cardBg: isDarkMode ? '#121824' : '#FFFFFF',
+    textMain: isDarkMode ? '#F1F5F9' : '#0F172A',
+    textSub: isDarkMode ? '#8E9BAE' : '#64748B',
+    border: isDarkMode ? '#1E293B' : '#E2E8F0',
+    inputBg: isDarkMode ? '#0A0E14' : '#F8FAFC',
+    accentBlue: '#00B4D8',
+    accentPurple: '#7B2CBF',
+    accentOrange: '#F77F00',
+    accentPink: '#F72585',
+    accentGreen: '#2A9D8F',
   };
 
-  const handleDeleteShipment = (id) => {
-    Alert.alert('تأكيد الحذف', 'هل أنت متأكد من حذف هذه الشحنة؟', [
+  const handleAddTransaction = (type) => {
+    const val = parseFloat(amountInput);
+    if (!val || isNaN(val)) {
+      Alert.alert('تنبيه', 'برجاء إدخال مبلغ صحيح');
+      return;
+    }
+    const newTx = {
+      id: Date.now().toString(),
+      type: type,
+      amount: val,
+      note: noteInput || (type === 'income' ? 'إيراد عام' : 'مصروف عام'),
+      date: new Date().toLocaleDateString('ar-EG')
+    };
+
+    setTransactions([newTx, ...transactions]);
+    if (type === 'income') setTotalIncome(prev => prev + val);
+    else setTotalExpense(prev => prev + val);
+    setAmountInput('');
+    setNoteInput('');
+  };
+
+  const handleDeleteTransaction = (id, type, amount) => {
+    Alert.alert('تأكيد الحذف', 'هل أنت متأكد من حذف هذه الحركة؟', [
       { text: 'إلغاء', style: 'cancel' },
-      {
-        text: 'حذف',
-        style: 'destructive',
+      { 
+        text: 'حذف', 
+        style: 'destructive', 
         onPress: () => {
-          const updatedList = savedShipments.filter(s => s.id !== id);
-          setSavedShipments(updatedList);
-          saveToStorage(updatedList);
-        }
+          setTransactions(transactions.filter(t => t.id !== id));
+          if (type === 'income') setTotalIncome(prev => Math.max(0, prev - amount));
+          else setTotalExpense(prev => Math.max(0, prev - amount));
+        } 
       }
     ]);
   };
 
-  const openStatusModal = (shipment) => {
-    setSelectedShipment(shipment);
-    setStatusModalVisible(true);
-  };
-
-  const changeShipmentStatus = (newStatus) => {
-    if (!selectedShipment) return;
-    const updatedList = savedShipments.map(s =>
-      s.id === selectedShipment.id ? { ...s, status: newStatus } : s
-    );
-    setSavedShipments(updatedList);
-    saveToStorage(updatedList);
-    setStatusModalVisible(false);
-    setSelectedShipment(null);
-    Alert.alert('تم التحديث', `تم تغيير حالة الشحنة إلى: ${newStatus}`);
-  };
-
-  const handleSendStatus = (s, statusType) => {
-    const currentDateTime = new Date().toLocaleString('ar-EG', { hour12: true });
-    const locationMapUrl = `https://maps.google.com/?q=${encodeURIComponent(s.destination)}`;
-    
-    let targetNumber = s.clientPhone ? s.clientPhone.trim() : DEFAULT_TARGET_WA;
-    let cleanPhone = targetNumber.replace(/[^0-9]/g, '');
-    if (cleanPhone.startsWith('0')) {
-      cleanPhone = '2' + cleanPhone;
-    }
-
-    let message = '';
-    if (statusType === 'arrival') {
-      message =
-        '🟢 [إشعار وصول للموقع]\n' +
-        `👨‍✈️ السائق: ${s.driverName}\n` +
-        `📦 رقم الشحنة: ${s.shipmentNo}\n` +
-        `📍 الوجهة: ${s.destination}\n` +
-        `⏰ وقت الوصول: ${currentDateTime}\n` +
-        `🗺️ لوكيشن تواجد السائق ورسالة الوصول:\n${locationMapUrl}\n` +
-        '-------------------';
-    } else {
-      message =
-        '🔴 [إشعار إنهاء وتسليم الشحنة]\n' +
-        `👨‍✈️ السائق: ${s.driverName}\n` +
-        `📦 رقم الشحنة: ${s.shipmentNo}\n` +
-        `📍 الوجهة: ${s.destination}\n` +
-        `🏁 وقت الانتهاء والتسليم: ${currentDateTime}\n` +
-        `🗺️ لوكيشن نقطة التسليم:\n${locationMapUrl}\n` +
-        '-------------------';
-    }
-
-    const url = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
-    Linking.openURL(url).catch(() => {
-      Alert.alert('خطأ', 'تعذر فتح تطبيق واتساب');
-    });
-  };
-
-  const handleExportAllReport = () => {
-    if (savedShipments.length === 0) {
-      Alert.alert('تنبيه', 'لا توجد شحنات مسجلة لتصديرها.');
+  const handleAddCustomer = () => {
+    if (!clientName || !clientPhone) {
+      Alert.alert('تنبيه', 'برجاء إدخال اسم العميل ورقم التليفون');
       return;
     }
+    const newCust = {
+      id: Date.now().toString(),
+      name: clientName,
+      phone: clientPhone,
+      totalDue: clientDue || '0'
+    };
+    setCustomers([newCust, ...customers]);
+    setClientName('');
+    setClientPhone('');
+    setClientDue('');
+  };
 
-    let reportText =
-      '📋 [تقرير الشحنات النشطة - شركة سانيتا]\n' +
-      `📅 تاريخ التقرير: ${new Date().toLocaleString('ar-EG', { hour12: true })}\n` +
-      '-------------------\n';
+  const handleDeleteCustomer = (id) => {
+    Alert.alert('تأكيد الحذف', 'هل أنت متأكد من حذف هذا العميل؟', [
+      { text: 'إلغاء', style: 'cancel' },
+      { text: 'حذف', style: 'destructive', onPress: () => setCustomers(customers.filter(c => c.id !== id)) }
+    ]);
+  };
 
-    savedShipments.forEach((s, index) => {
-      const locationMapUrl = `https://maps.google.com/?q=${encodeURIComponent(s.destination)}`;
-      reportText +=
-        `\n${index + 1}. السائق: ${s.driverName}\n` +
-        `📦 الشحنة: ${s.shipmentNo}\n` +
-        `📍 الوجهة: ${s.destination}\n` +
-        `📦 الحالة: ${s.status || 'في الطريق'}\n` +
-        (s.smartETA ? `⏱️ الـ ETA: ${s.smartETA}\n` : '') +
-        (s.meterNo ? '⚡ العداد: ' + s.meterNo + '\n' : '') +
-        (s.driverNotes ? '📝 ملاحظات السائق: ' + s.driverNotes + '\n' : '') +
-        `🗺️ لوكيشن الوجهة:\n${locationMapUrl}\n` +
-        '-------------------';
-    });
-
-    let targetNumber = DEFAULT_TARGET_WA;
-    let cleanPhone = targetNumber.replace(/[^0-9]/g, '');
-    if (cleanPhone.startsWith('0')) {
-      cleanPhone = '2' + cleanPhone;
+  const handleAddProduct = () => {
+    if (!prodName || !prodPrice || !prodQty) {
+      Alert.alert('تنبيه', 'برجاء إدخال اسم المنتج، السعر، والكمية');
+      return;
     }
-
-    const url = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(reportText)}`;
-    Linking.openURL(url).catch(() => {
-      Alert.alert('خطأ', 'تعذر فتح تطبيق واتساب');
-    });
+    const newProd = {
+      id: Date.now().toString(),
+      name: prodName,
+      price: prodPrice,
+      qty: prodQty,
+      emoji: prodEmoji || '📦'
+    };
+    setProducts([newProd, ...products]);
+    setProdName('');
+    setProdPrice('');
+    setProdQty('');
+    setProdEmoji('');
   };
 
-  const contactDeveloper = () => {
-    let cleanPhone = DEVELOPER_PHONE.replace(/[^0-9]/g, '');
-    if (cleanPhone.startsWith('0')) {
-      cleanPhone = '2' + cleanPhone;
+  const handleDeleteProduct = (id) => {
+    Alert.alert('تأكيد الحذف', 'هل أنت متأكد من حذف هذا المنتج؟', [
+      { text: 'إلغاء', style: 'cancel' },
+      { text: 'حذف', style: 'destructive', onPress: () => setProducts(products.filter(p => p.id !== id)) }
+    ]);
+  };
+
+  const handleAddEmployee = () => {
+    if (!empName || !empSalary) {
+      Alert.alert('تنبيه', 'برجاء إدخال اسم الموظف والراتب');
+      return;
     }
-    const url = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent('السلام عليكم يا مهندس، بخصوص تطبيق Sanita Logistics...')}`;
-    Linking.openURL(url).catch(() => {
-      Alert.alert('خطأ', 'تعذر فتح تطبيق واتساب للتواصل مع المطور');
-    });
+    const newEmp = {
+      id: Date.now().toString(),
+      name: empName,
+      salary: empSalary,
+      phone: empPhone || 'غير محدد'
+    };
+    setEmployees([newEmp, ...employees]);
+    setEmpName('');
+    setEmpSalary('');
+    setEmpPhone('');
   };
 
-  const theme = {
-    bg: isDarkMode ? '#0F172A' : '#F8FAFC',
-    cardBg: isDarkMode ? '#1E293B' : '#FFFFFF',
-    textMain: isDarkMode ? '#F8FAFC' : '#0F172A',
-    textSub: isDarkMode ? '#94A3B8' : '#64748B',
-    border: isDarkMode ? '#334155' : '#E2E8F0',
-    inputBg: isDarkMode ? '#0F172A' : '#F1F5F9'
+  const handleDeleteEmployee = (id) => {
+    Alert.alert('تأكيد الحذف', 'هل أنت متأكد من حذف هذا الموظف؟', [
+      { text: 'إلغاء', style: 'cancel' },
+      { text: 'حذف', style: 'destructive', onPress: () => setEmployees(employees.filter(e => e.id !== id)) }
+    ]);
   };
 
-  if (isSplashVisible) {
+  // ==========================================
+  // شاشة الترحيب الافتتاحية الفخمة
+  // ==========================================
+  if (showWelcome) {
     return (
-      <Animated.View style={[styles.splashContainer, { opacity: fadeAnim, backgroundColor: '#0F172A' }]}>
-        <StatusBar barStyle="light-content" backgroundColor="#0F172A" />
-        <Image source={{ uri: LOGO_URL }} style={styles.splashLogo} resizeMode="contain" />
-        <Text style={styles.splashWelcome}>أهلاً بكم</Text>
-        <Text style={styles.splashTitle}>Sanita</Text>
-        <Text style={styles.splashSubtitle}>Sanita Logistics Guide</Text>
-      </Animated.View>
+      <View style={[styles.welcomeContainer, { backgroundColor: isDarkMode ? '#07090E' : '#0096C7' }]}>
+        <StatusBar barStyle="light-content" backgroundColor={isDarkMode ? '#07090E' : '#0096C7'} />
+        
+        <View style={styles.welcomeContent}>
+          <View style={styles.welcomeIconCircle}>
+            <MaterialCommunityIcons name="shield-crown-outline" size={56} color="#00B4D8" />
+          </View>
+          
+          <Text style={styles.welcomeTitle}>مدير الأعمال الشامل</Text>
+          
+          <View style={styles.aboutBox}>
+            <Text style={styles.aboutText}>
+              🌟 نظام ذكي فائق الاحترافية لإدارة الشركات، المشاريع، والمتاجر الكبرى. يمنحك سيطرة كاملة على الخزنة، حسابات العملاء، المخزون، وشؤون الموظفين بتصميم عصري وأمان تام.
+            </Text>
+          </View>
+
+          <TouchableOpacity 
+            style={styles.startAppBtn} 
+            onPress={() => setShowWelcome(false)}
+          >
+            <Text style={styles.startAppBtnText}>دخول لوحة التحكم ⚡</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.whatsappBtn} 
+            onPress={handleOpenWhatsApp}
+          >
+            <MaterialCommunityIcons name="whatsapp" size={20} color="#25D366" style={{ marginRight: 8 }} />
+            <Text style={styles.whatsappBtnText}>تواصل مع مطور التطبيق 💬</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={{ alignItems: 'center', width: '100%', paddingBottom: 10 }}>
+          <Text style={styles.welcomeFooter}>Developed by Eng. Sayed Ahmed Sayed 💻</Text>
+        </View>
+      </View>
     );
   }
 
+  // الواجهة الأساسية للتطبيق
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.bg }]}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={theme.bg} />
 
-      {!isOnline && (
-        <View style={styles.offlineBanner}>
-          <Text style={styles.offlineText}>⚠️ تنبيه: لا يوجد اتصال بالإنترنت حالياً</Text>
-        </View>
-      )}
-
+      {/* الهيدر العلوي */}
       <View style={[styles.header, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-        <TouchableOpacity style={[styles.menuBtn, { backgroundColor: theme.inputBg }]} onPress={() => setMenuVisible(true)}>
-          <Text style={{ fontSize: 20, color: theme.textMain }}>☰</Text>
-        </TouchableOpacity>
-
-        <View style={styles.headerTextContainer}>
-          <Text style={[styles.title, { color: theme.textMain }]}>Sanita Location 🚚</Text>
-          <Text style={styles.subtitle}>دليل مخازن وشركات الأونلاين والبنوك بمصر</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={[styles.headerLogoBox, { backgroundColor: isDarkMode ? '#1E293B' : '#E0F2FE' }]}>
+            <MaterialCommunityIcons name="finance" size={20} color="#00B4D8" />
+          </View>
+          <View style={{ marginLeft: 10 }}>
+            <Text style={[styles.appName, { color: theme.textMain }]}>مدير الأعمال 👑</Text>
+            <Text style={styles.appSubtitle}>الإصدار الاحترافي المرن</Text>
+          </View>
         </View>
 
-        <Image source={{ uri: LOGO_URL }} style={styles.logo} resizeMode="contain" />
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity 
+            onPress={() => setShowWelcome(true)}
+            style={[styles.resetIconBtn, { borderColor: theme.border, backgroundColor: theme.inputBg, marginRight: 6 }]}
+          >
+            <MaterialCommunityIcons name="information-outline" size={17} color="#00B4D8" />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            onPress={handleResetAllData}
+            style={[styles.resetIconBtn, { borderColor: theme.border, backgroundColor: theme.inputBg }]}
+          >
+            <MaterialCommunityIcons name="trash-can-outline" size={17} color="#EF4444" />
+          </TouchableOpacity>
+
+          <Switch
+            value={isDarkMode}
+            onValueChange={setIsDarkMode}
+            trackColor={{ false: '#CBD5E1', true: '#1E293B' }}
+            thumbColor={isDarkMode ? '#00B4D8' : '#FFFFFF'}
+            style={{ marginLeft: 6 }}
+          />
+        </View>
       </View>
 
+      {/* شريط التنقل الاحترافي */}
       <View style={[styles.tabBar, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-        <TouchableOpacity
-          style={[styles.tabItem, activeTab === 'locations' && styles.activeTabItem]}
-          onPress={() => handleTabPress('locations')}
-        >
-          <Text style={[styles.tabText, { color: activeTab === 'locations' ? '#0284C7' : theme.textSub }]}>
-            📍 المخازن
-          </Text>
+        <TouchableOpacity style={[styles.tabBtn, activeTab === 'finance' && { backgroundColor: theme.accentBlue, shadowColor: theme.accentBlue, shadowOpacity: 0.3, shadowRadius: 4, elevation: 3 }]} onPress={() => setActiveTab('finance')}>
+          <MaterialCommunityIcons name="wallet-outline" size={16} color={activeTab === 'finance' ? '#FFF' : theme.textSub} style={{ marginBottom: 2 }} />
+          <Text style={[styles.tabText, { color: activeTab === 'finance' ? '#FFF' : theme.textSub }]}>الخزنة</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={[styles.tabBtn, activeTab === 'crm' && { backgroundColor: theme.accentPurple, shadowColor: theme.accentPurple, shadowOpacity: 0.3, shadowRadius: 4, elevation: 3 }]} onPress={() => setActiveTab('crm')}>
+          <MaterialCommunityIcons name="account-group-outline" size={16} color={activeTab === 'crm' ? '#FFF' : theme.textSub} style={{ marginBottom: 2 }} />
+          <Text style={[styles.tabText, { color: activeTab === 'crm' ? '#FFF' : theme.textSub }]}>العملاء</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.tabItem, activeTab === 'driver' && styles.activeTabItem]}
-          onPress={() => handleTabPress('driver')}
-        >
-          <Text style={[styles.tabText, { color: activeTab === 'driver' ? '#0284C7' : theme.textSub }]}>
-            📦 إدارة الشحنات
-          </Text>
+        <TouchableOpacity style={[styles.tabBtn, activeTab === 'inventory' && { backgroundColor: theme.accentOrange, shadowColor: theme.accentOrange, shadowOpacity: 0.3, shadowRadius: 4, elevation: 3 }]} onPress={() => setActiveTab('inventory')}>
+          <MaterialCommunityIcons name="package-variant-closed" size={16} color={activeTab === 'inventory' ? '#FFF' : theme.textSub} style={{ marginBottom: 2 }} />
+          <Text style={[styles.tabText, { color: activeTab === 'inventory' ? '#FFF' : theme.textSub }]}>المخزن</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.tabItem, activeTab === 'about' && styles.activeTabItem]}
-          onPress={() => handleTabPress('about')}
-        >
-          <Text style={[styles.tabText, { color: activeTab === 'about' ? '#0284C7' : theme.textSub }]}>
-            ℹ️ عن التطبيق
-          </Text>
+        <TouchableOpacity style={[styles.tabBtn, activeTab === 'hr' && { backgroundColor: theme.accentPink, shadowColor: theme.accentPink, shadowOpacity: 0.3, shadowRadius: 4, elevation: 3 }]} onPress={() => setActiveTab('hr')}>
+          <MaterialCommunityIcons name="badge-account-outline" size={16} color={activeTab === 'hr' ? '#FFF' : theme.textSub} style={{ marginBottom: 2 }} />
+          <Text style={[styles.tabText, { color: activeTab === 'hr' ? '#FFF' : theme.textSub }]}>الموظفين</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.tabBtn, activeTab === 'reports' && { backgroundColor: theme.accentGreen, shadowColor: theme.accentGreen, shadowOpacity: 0.3, shadowRadius: 4, elevation: 3 }]} onPress={() => setActiveTab('reports')}>
+          <MaterialCommunityIcons name="chart-box-outline" size={16} color={activeTab === 'reports' ? '#FFF' : theme.textSub} style={{ marginBottom: 2 }} />
+          <Text style={[styles.tabText, { color: activeTab === 'reports' ? '#FFF' : theme.textSub }]}>التقارير</Text>
         </TouchableOpacity>
       </View>
 
-      {activeTab === 'locations' && (
-        <View style={styles.contentContainer}>
-          <TextInput
-            style={[styles.searchInput, { backgroundColor: theme.cardBg, color: theme.textMain, borderColor: theme.border }]}
-            placeholder="ابحث باسم المخزن، الشركة، أو المدينة..."
-            placeholderTextColor={theme.textSub}
-            value={search}
-            onChangeText={setSearch}
-          />
-
-          <View style={styles.companiesScrollWrapper}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.companiesScrollContainer}>
-              {COMPANIES_LIST.map((comp) => (
-                <TouchableOpacity
-                  key={comp}
-                  style={[
-                    styles.companyChip,
-                    {
-                      backgroundColor: selectedCompany === comp ? '#0284C7' : theme.cardBg,
-                      borderColor: theme.border
-                    }
-                  ]}
-                  onPress={() => setSelectedCompany(comp)}
-                >
-                  <Text style={{ color: selectedCompany === comp ? '#FFF' : theme.textMain, fontWeight: 'bold' }}>
-                    {comp}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-
-          <FlatList
-            data={filteredLocations}
-            keyExtractor={(item) => item.id}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-            renderItem={({ item }) => (
-              <View style={[styles.locationCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-                <View style={styles.cardHeaderRow}>
-                  <Text style={[styles.locationName, { color: theme.textMain }]} numberOfLines={2}>{item.name}</Text>
-                  <Text style={styles.companyBadge}>{item.company}</Text>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        
+        {/* --- 1. الحسابات والخزنة --- */}
+        {activeTab === 'finance' && (
+          <>
+            <View style={[styles.balanceCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+              <View style={styles.balanceHeaderRow}>
+                <Text style={[styles.balanceTitle, { color: theme.textSub }]}>صافي الرصيد الحالي بالخزنة</Text>
+                <MaterialCommunityIcons name="shield-check" size={20} color={theme.accentBlue} />
+              </View>
+              <Text style={[styles.balanceAmount, { color: netBalance >= 0 ? '#2A9D8F' : '#EF4444' }]}>{netBalance} <Text style={{ fontSize: 16 }}>ج.م</Text></Text>
+              
+              <View style={[styles.rowStats, { borderTopColor: theme.border }]}>
+                <View style={styles.statItem}>
+                  <Text style={[styles.statLabel, { color: theme.textSub }]}>إجمالي الداخل</Text>
+                  <Text style={[styles.statValue, { color: '#2A9D8F' }]}>+{totalIncome} ج</Text>
                 </View>
-                <Text style={[styles.locationNotes, { color: theme.textSub }]} numberOfLines={3}>{item.notes}</Text>
-                <View style={styles.cardActionsRow}>
-                  <TouchableOpacity
-                    style={[styles.actionBtn, { backgroundColor: '#16A34A', opacity: 0.5 }]}
-                    onPress={() => Alert.alert('تنبيه', 'خاصية الاتصال تحت التعديل حالياً ⚠️')}
-                  >
-                    <Text style={styles.actionBtnText}>📞 اتصال</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={[styles.actionBtn, { backgroundColor: '#25D366', opacity: 0.5 }]}
-                    onPress={() => Alert.alert('تنبيه', 'خاصية واتساب تحت التعديل حالياً ⚠️')}
-                  >
-                    <Text style={styles.actionBtnText}>💬 واتساب</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[styles.actionBtn, { backgroundColor: '#0284C7' }]}
-                    onPress={() => Linking.openURL(item.mapsUrl)}
-                  >
-                    <Text style={styles.actionBtnText}>🗺️ الخرائط</Text>
-                  </TouchableOpacity>
+                <View style={[styles.statDivider, { backgroundColor: theme.border }]} />
+                <View style={styles.statItem}>
+                  <Text style={[styles.statLabel, { color: theme.textSub }]}>إجمالي الخارج</Text>
+                  <Text style={[styles.statValue, { color: '#EF4444' }]}>-{totalExpense} ج</Text>
                 </View>
               </View>
+            </View>
+
+            <View style={[styles.formCard, { backgroundColor: theme.cardBg, borderColor: theme.border, marginBottom: 15 }]}>
+              <Text style={[styles.formTitle, { color: theme.textMain }]}>✍️ تسجيل حركة مالية جديدة</Text>
+              <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="ادخل المبلغ (مثال: 1500)..." placeholderTextColor={theme.textSub} keyboardType="numeric" value={amountInput} onChangeText={setAmountInput} />
+              <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="وصف الحركة (مثال: مبيعات، إيجار)..." placeholderTextColor={theme.textSub} value={noteInput} onChangeText={setNoteInput} />
+              
+              <View style={styles.btnRow}>
+                <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#2A9D8F', flex: 1, marginLeft: 6 }]} onPress={() => handleAddTransaction('income')}>
+                  <MaterialCommunityIcons name="arrow-down-left" size={16} color="#FFF" style={{ marginRight: 4 }} />
+                  <Text style={styles.btnText}>إضافة إيراد</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#EF4444', flex: 1, marginRight: 6 }]} onPress={() => handleAddTransaction('expense')}>
+                  <MaterialCommunityIcons name="arrow-up-right" size={16} color="#FFF" style={{ marginRight: 4 }} />
+                  <Text style={[styles.btnText, { color: '#FFF' }]}>إضافة مصروف</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {transactions.length > 0 && (
+              <TextInput style={[styles.input, { backgroundColor: theme.cardBg, color: theme.textMain, borderColor: theme.border, marginBottom: 12 }]} placeholder="🔍 ابحث في بيان الحركات..." placeholderTextColor={theme.textSub} value={financeSearch} onChangeText={setFinanceSearch} />
             )}
-          />
-        </View>
-      )}
 
-      {activeTab === 'driver' && (
-        <ScrollView style={styles.contentContainer} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-          <View style={[styles.formCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-            <Text style={[styles.formTitle, { color: theme.textMain }]}>📝 تسجيل شحنة جديدة</Text>
-
-            <TextInput
-              style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]}
-              placeholder="اسم السائق..."
-              placeholderTextColor={theme.textSub}
-              value={driverName}
-              onChangeText={setDriverName}
-            />
-
-            <TextInput
-              style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]}
-              placeholder="رقم الشحنة / البوليصة..."
-              placeholderTextColor={theme.textSub}
-              value={shipmentNo}
-              onChangeText={setShipmentNo}
-            />
-
-            <TextInput
-              style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]}
-              placeholder="الوجهة / المخزن..."
-              placeholderTextColor={theme.textSub}
-              value={destination}
-              onChangeText={setDestination}
-            />
-
-            <TextInput
-              style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]}
-              placeholder="رقم هاتف المشرف المسؤول..."
-              placeholderTextColor={theme.textSub}
-              keyboardType="phone-pad"
-              value={clientPhone}
-              onChangeText={setClientPhone}
-            />
-
-            <TextInput
-              style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]}
-              placeholder="ملاحظات السائق أو الشحنة..."
-              placeholderTextColor={theme.textSub}
-              value={shipmentNotes}
-              onChangeText={setShipmentNotes}
-            />
-
-            <Text style={{ color: theme.textSub, fontSize: 12, marginBottom: 5 }}>حالة الشحنة الابتدائية:</Text>
-            <View style={styles.statusSelectRow}>
-              {['في الطريق', 'تم الاستلام', 'تم التسليم'].map((st) => (
-                <TouchableOpacity
-                  key={st}
-                  style={[
-                    styles.statusChipSelect,
-                    { backgroundColor: shipmentStatus === st ? '#0284C7' : theme.inputBg, borderColor: theme.border }
-                  ]}
-                  onPress={() => setShipmentStatus(st)}
-                >
-                  <Text style={{ color: shipmentStatus === st ? '#FFF' : theme.textMain, fontSize: 12, fontWeight: 'bold' }}>
-                    {st}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <TouchableOpacity style={styles.submitBtn} onPress={handleAddShipment}>
-              <Text style={styles.submitBtnText}>حفظ وإضافة الشحنة 🚀</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.savedHeaderRow}>
-            <Text style={[styles.savedTitle, { color: theme.textMain }]}>الشحنات المسجلة ({savedShipments.length})</Text>
-            {savedShipments.length > 0 && (
-              <TouchableOpacity style={styles.exportAllBtn} onPress={handleExportAllReport}>
-                <Text style={styles.exportAllText}>📤 إرسال تقرير الكل</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-
-          {savedShipments.map((item) => (
-            <View key={item.id} style={[styles.shipmentCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-              <View style={styles.cardHeaderRow}>
-                <Text style={[styles.shipmentDriver, { color: theme.textMain }]}>👨‍✈️ {item.driverName}</Text>
-                <TouchableOpacity onPress={() => openStatusModal(item)}>
-                  <Text style={[styles.statusBadge, { backgroundColor: item.status === 'تم التسليم' ? '#16A34A' : item.status === 'تم الاستلام' ? '#0284C7' : '#D97706' }]}>
-                    {item.status || 'في الطريق'} 🔄
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              <Text style={[styles.shipmentDetail, { color: theme.textSub }]}>📦 رقم الشحنة: {item.shipmentNo}</Text>
-              <Text style={[styles.shipmentDetail, { color: theme.textSub }]}>📍 الوجهة: {item.destination}</Text>
-              <Text style={[styles.shipmentDetail, { color: theme.textSub }]}>📞 هاتف المشرف: {item.clientPhone}</Text>
-              {item.driverNotes ? <Text style={[styles.shipmentDetail, { color: theme.textSub }]}>📝 ملاحظات: {item.driverNotes}</Text> : null}
-              <Text style={[styles.shipmentDate, { color: theme.textSub }]}>⏰ {item.date}</Text>
-
-              <View style={styles.etaBox}>
-                <MaterialCommunityIcons name="clock-fast" size={18} color="#00E676" />
-                <View style={styles.etaTextContainer}>
-                  <Text style={styles.etaLabel}>وقت الوصول المتوقع (Smart ETA):</Text>
-                  <Text style={styles.etaValue}>{item.smartETA || 'قريباً...'}</Text>
+            <Text style={[styles.sectionTitleHeader, { color: theme.textMain }]}>سجل الحركات ({filteredTransactions.length})</Text>
+            {filteredTransactions.map(tx => (
+              <View key={tx.id} style={[styles.customerCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+                <View style={[styles.cardIconBox, { backgroundColor: tx.type === 'income' ? 'rgba(42, 157, 143, 0.12)' : 'rgba(239, 68, 68, 0.12)' }]}>
+                  <MaterialCommunityIcons name={tx.type === 'income' ? 'arrow-down-left' : 'arrow-up-right'} size={18} color={tx.type === 'income' ? '#2A9D8F' : '#EF4444'} />
                 </View>
-              </View>
-
-              <View style={styles.shipmentActionsRow}>
-                <TouchableOpacity style={[styles.shipmentActionBtn, { backgroundColor: '#25D366' }]} onPress={() => handleSendStatus(item, 'arrival')}>
-                  <Text style={styles.actionBtnText}>🟢 وصول</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={[styles.shipmentActionBtn, { backgroundColor: '#DC2626' }]} onPress={() => handleSendStatus(item, 'finish')}>
-                  <Text style={styles.actionBtnText}>🔴 تسليم</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={[styles.shipmentActionBtn, { backgroundColor: '#475569' }]} onPress={() => handleDeleteShipment(item.id)}>
-                  <Text style={styles.actionBtnText}>🗑️ حذف</Text>
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                  <Text style={[styles.custName, { color: theme.textMain }]}>{tx.note}</Text>
+                  <Text style={[styles.custPhone, { color: theme.textSub }]}>📅 {tx.date}</Text>
+                </View>
+                <Text style={[styles.custDue, { color: tx.type === 'income' ? '#2A9D8F' : '#EF4444' }]}>
+                  {tx.type === 'income' ? `+${tx.amount}` : `-${tx.amount}`} ج.م
+                </Text>
+                <TouchableOpacity onPress={() => handleDeleteTransaction(tx.id, tx.type, tx.amount)} style={styles.deleteIconBtn}>
+                  <MaterialCommunityIcons name="delete-outline" size={17} color="#EF4444" />
                 </TouchableOpacity>
               </View>
-            </View>
-          ))}
-        </ScrollView>
-      )}
-
-      {activeTab === 'about' && (
-        <ScrollView style={styles.contentContainer}>
-          <View style={[styles.aboutCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
-            <Image source={{ uri: LOGO_URL }} style={styles.aboutLogo} resizeMode="contain" />
-            <Text style={[styles.aboutTitle, { color: theme.textMain }]}>Sanita Logistics Guide</Text>
-            
-            <Text style={styles.devNameText}>Developed by Engineer Sayed Ahmed</Text>
-
-            <Text style={[styles.aboutDesc, { color: theme.textSub }]}>
-              تطبيق Sanita Logistics هو رفيقك الاحترافي الأول في مصر، صُمم خصيصاً لتسهيل وتطوير العمليات اللوجستية وإدارة الشحنات بذكاء والكفاءة عالية. نهدف من خلال هذا التطبيق إلى تزويد السناد والمندوبين بأحدث أدوات التتبع، وسرعة الوصول للمخازن والشركات الكبرى، وإرسال التقارير الفورية لضمان أعلى معايير الجودة والاحترافية في العمل.
-            </Text>
-
-            <Text style={styles.copyrightText}>جميع الحقوق محفوظة لدى شركة سانيتا للمنتجات الاستهلاكية © 2026</Text>
-
-            <View style={{ width: '100%', marginBottom: 15, marginTop: 10 }}>
-              <TouchableOpacity 
-                style={styles.customerServiceBtn} 
-                onPress={() => setShowUnderEditNotice(!showUnderEditNotice)}
-              >
-                <Text style={styles.customerServiceBtnText}>🎧 خدمة العملاء</Text>
-              </TouchableOpacity>
-              {showUnderEditNotice && (
-                <Text style={styles.underEditNoticeText}>⚠️ تحت التعديل حالياً، سيتم توفير الخدمة قريباً</Text>
-              )}
-            </View>
-
-            <TouchableOpacity style={styles.devContactBtn} onPress={contactDeveloper}>
-              <Text style={styles.devContactBtnText}>👨‍💻 تواصل مع المطور</Text>
-            </TouchableOpacity>
-
-            <View style={styles.aboutQuickActions}>
-              <View style={{ flex: 1, marginHorizontal: 3 }}>
-                <TouchableOpacity 
-                  style={[styles.aboutActionBtn, { backgroundColor: '#25D366', opacity: 0.5 }]} 
-                  onPress={() => Alert.alert('تنبيه', 'خاصية تواصل واتساب تحت التعديل حالياً ⚠️')}
-                >
-                  <Text style={styles.actionBtnText}>💬 واتساب</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={{ flex: 1, marginHorizontal: 3 }}>
-                <TouchableOpacity 
-                  style={[styles.aboutActionBtn, { backgroundColor: '#16A34A', opacity: 0.5 }]} 
-                  onPress={() => Alert.alert('تنبيه', 'خاصية تواصل فون تحت التعديل حالياً ⚠️')}
-                >
-                  <Text style={styles.actionBtnText}>📞 اتصال</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </ScrollView>
-      )}
-
-      <Modal visible={statusModalVisible} transparent={true} animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={[styles.menuContainer, { backgroundColor: theme.cardBg, minHeight: 220 }]}>
-            <Text style={[styles.menuHeaderTitle, { color: theme.textMain }]}>🔄 تغيير حالة الشحنة</Text>
-            
-            {['في الطريق', 'تم الاستلام', 'تم التسليم', 'مؤجل / مشكلة'].map((st) => (
-              <TouchableOpacity
-                key={st}
-                style={[styles.modalStatusOptionBtn, { backgroundColor: theme.inputBg, borderColor: theme.border }]}
-                onPress={() => changeShipmentStatus(st)}
-              >
-                <Text style={{ color: theme.textMain, fontWeight: 'bold' }}>{st}</Text>
-              </TouchableOpacity>
             ))}
+          </>
+        )}
 
-            <TouchableOpacity style={styles.closeMenuBtn} onPress={() => setStatusModalVisible(false)}>
-              <Text style={{ color: '#FFF', fontWeight: 'bold' }}>إغلاق</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+        {/* --- 2. العملاء --- */}
+        {activeTab === 'crm' && (
+          <>
+            <View style={[styles.formCard, { backgroundColor: theme.cardBg, borderColor: theme.border, marginBottom: 20 }]}>
+              <Text style={[styles.formTitle, { color: theme.textMain }]}>👥 إضافة عميل جديد ومتابعة الديون</Text>
+              <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="اسم العميل الرباعي أو التجاري..." placeholderTextColor={theme.textSub} value={clientName} onChangeText={setClientName} />
+              <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="رقم الهاتف..." placeholderTextColor={theme.textSub} keyboardType="phone-pad" value={clientPhone} onChangeText={setClientPhone} />
+              <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="المبلغ المتبقي عليه ديون (اختياري)..." placeholderTextColor={theme.textSub} keyboardType="numeric" value={clientDue} onChangeText={setClientDue} />
+              
+              <TouchableOpacity style={[styles.actionBtn, { backgroundColor: theme.accentPurple, width: '100%' }]} onPress={handleAddCustomer}>
+                <MaterialCommunityIcons name="account-plus-outline" size={18} color="#FFF" style={{ marginRight: 6 }} />
+                <Text style={styles.btnText}>حفظ بيانات العميل</Text>
+              </TouchableOpacity>
+            </View>
 
-      <Modal visible={pinModalVisible} transparent={true} animationType="fade">
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalOverlay}>
-          <View style={[styles.menuContainer, { backgroundColor: theme.cardBg, minHeight: 220 }]}>
-            <Text style={[styles.menuHeaderTitle, { color: theme.textMain }]}>🔒 أدخل الرمز السري للمتابعة</Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border, marginBottom: 15 }]}
-              placeholder="الرمز السري..."
-              placeholderTextColor={theme.textSub}
-              secureTextEntry
-              keyboardType="numeric"
-              value={enteredPin}
-              onChangeText={setEnteredPin}
-            />
-            <TouchableOpacity style={styles.submitBtn} onPress={verifyPin}>
-              <Text style={styles.submitBtnText}>تحقق ودخول</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.closeMenuBtn, { marginTop: 10 }]} onPress={() => setPinModalVisible(false)}>
-              <Text style={{ color: '#FFF', fontWeight: 'bold' }}>إغلاق</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
+            {customers.length > 0 && (
+              <TextInput style={[styles.input, { backgroundColor: theme.cardBg, color: theme.textMain, borderColor: theme.border, marginBottom: 12 }]} placeholder="🔍 ابحث عن اسم العميل..." placeholderTextColor={theme.textSub} value={customerSearch} onChangeText={setCustomerSearch} />
+            )}
 
-      <Modal visible={pinSetupModal} transparent={true} animationType="fade">
-        <KeyboardAvoidingView 
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-          style={styles.modalOverlay}
-        >
-          <View style={[styles.menuContainer, { backgroundColor: theme.cardBg, minHeight: 220 }]}>
-            <Text style={[styles.menuHeaderTitle, { color: theme.textMain }]}>🔑 تعيين الرمز السري الجديد</Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border, marginBottom: 15 }]}
-              placeholder="أدخل الرمز السري (3 أرقام فأكثر)..."
-              placeholderTextColor={theme.textSub}
-              secureTextEntry
-              keyboardType="numeric"
-              value={tempNewPin}
-              onChangeText={setTempNewPin}
-            />
-            <TouchableOpacity style={styles.submitBtn} onPress={saveNewCustomPin}>
-              <Text style={styles.submitBtnText}>حفظ الرمز السري</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.closeMenuBtn, { marginTop: 10 }]} onPress={() => setPinSetupModal(false)}>
-              <Text style={{ color: '#FFF', fontWeight: 'bold' }}>إغلاق</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
+            <Text style={[styles.sectionTitleHeader, { color: theme.textMain }]}>قائمة العملاء المسجلين ({filteredCustomers.length})</Text>
+            {filteredCustomers.map(cust => (
+              <View key={cust.id} style={[styles.customerCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+                <View style={[styles.cardIconBox, { backgroundColor: 'rgba(123, 44, 191, 0.12)' }]}>
+                  <MaterialCommunityIcons name="account-outline" size={18} color={theme.accentPurple} />
+                </View>
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                  <Text style={[styles.custName, { color: theme.textMain }]}>{cust.name}</Text>
+                  <Text style={[styles.custPhone, { color: theme.textSub }]}>📞 {cust.phone}</Text>
+                </View>
+                <View style={{ alignItems: 'flex-end', marginRight: 10 }}>
+                  <Text style={{ fontSize: 9, color: theme.textSub }}>المتبقي عليه:</Text>
+                  <Text style={[styles.custDue, { color: '#EF4444' }]}>{cust.totalDue} ج.م</Text>
+                </View>
+                <View style={{ flexDirection: 'row', marginLeft: 4 }}>
+                  <TouchableOpacity onPress={() => openEditModal('customer', cust)} style={[styles.smallIconAction, { backgroundColor: theme.inputBg, borderColor: theme.border, marginRight: 4 }]}>
+                    <MaterialCommunityIcons name="pencil-outline" size={15} color="#00B4D8" />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleDeleteCustomer(cust.id)} style={[styles.smallIconAction, { backgroundColor: theme.inputBg, borderColor: theme.border }]}>
+                    <MaterialCommunityIcons name="delete-outline" size={15} color="#EF4444" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+          </>
+        )}
 
-      <Modal visible={menuVisible} transparent={true} animationType="slide">
+        {/* --- 3. المخازن --- */}
+        {activeTab === 'inventory' && (
+          <>
+            <View style={[styles.formCard, { backgroundColor: theme.cardBg, borderColor: theme.border, marginBottom: 20 }]}>
+              <Text style={[styles.formTitle, { color: theme.textMain }]}>📦 إضافة منتج جديد للمخزن</Text>
+              <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="اسم المنتج..." placeholderTextColor={theme.textSub} value={prodName} onChangeText={setProdName} />
+              <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="سعر القطعة..." placeholderTextColor={theme.textSub} keyboardType="numeric" value={prodPrice} onChangeText={setProdPrice} />
+              <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="الكمية المتاحة..." placeholderTextColor={theme.textSub} keyboardType="numeric" value={prodQty} onChangeText={setProdQty} />
+              <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="رمز تعبيري (مثل: 📱, 💻, 👟)..." placeholderTextColor={theme.textSub} value={prodEmoji} onChangeText={setProdEmoji} maxLength={2} />
+
+              <TouchableOpacity style={[styles.actionBtn, { backgroundColor: theme.accentOrange, width: '100%', marginTop: 5 }]} onPress={handleAddProduct}>
+                <MaterialCommunityIcons name="plus-box-outline" size={18} color="#FFF" style={{ marginRight: 6 }} />
+                <Text style={styles.btnText}>إضافة المنتج للمخزن</Text>
+              </TouchableOpacity>
+            </View>
+
+            {products.length > 0 && (
+              <>
+                <TextInput style={[styles.input, { backgroundColor: theme.cardBg, color: theme.textMain, borderColor: theme.border, marginBottom: 8 }]} placeholder="🔍 ابحث عن اسم منتج..." placeholderTextColor={theme.textSub} value={productSearch} onChangeText={setProductSearch} />
+                
+                <TouchableOpacity style={[styles.filterBadgeBtn, { backgroundColor: lowStockFilter ? '#EF4444' : theme.cardBg, borderColor: theme.border, marginBottom: 12 }]} onPress={() => setLowStockFilter(!lowStockFilter)}>
+                  <MaterialCommunityIcons name="alert-circle-outline" size={16} color={lowStockFilter ? '#FFF' : '#EF4444'} style={{ marginRight: 6 }} />
+                  <Text style={{ color: lowStockFilter ? '#FFF' : theme.textMain, fontSize: 11, fontWeight: 'bold' }}>
+                    {lowStockFilter ? 'عرض جميع المنتجات' : 'تنبيهات المنتجات الوشيكة النفاذ (≤ 5 قطع) ⚠️'}
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
+
+            <Text style={[styles.sectionTitleHeader, { color: theme.textMain }]}>محتويات المخزن ({filteredProducts.length})</Text>
+            
+            {filteredProducts.map(prod => {
+              const isLow = parseInt(prod.qty || 0) <= 5;
+              return (
+                <View key={prod.id} style={[styles.customerCard, { backgroundColor: theme.cardBg, borderColor: isLow ? '#EF4444' : theme.border, borderWidth: isLow ? 1.5 : 1 }]}>
+                  <View style={[styles.emojiBox, { backgroundColor: theme.inputBg, borderColor: theme.border }]}>
+                    <Text style={{ fontSize: 20 }}>{prod.emoji || '📦'}</Text>
+                  </View>
+
+                  <View style={{ flex: 1, marginLeft: 10 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Text style={[styles.custName, { color: theme.textMain }]}>{prod.name}</Text>
+                      {isLow && (
+                        <View style={styles.lowStockTag}>
+                          <Text style={{ color: '#FFF', fontSize: 8, fontWeight: 'bold' }}>وشك النفاذ</Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={[styles.custPhone, { color: theme.textSub }]}>سعر القطعة: {prod.price} ج.م</Text>
+                  </View>
+                  
+                  <View style={{ alignItems: 'flex-end', marginRight: 10 }}>
+                    <Text style={{ fontSize: 9, color: theme.textSub }}>الكمية:</Text>
+                    <Text style={[styles.custDue, { color: isLow ? '#EF4444' : theme.accentOrange }]}>{prod.qty} ق</Text>
+                  </View>
+
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 4 }}>
+                    <TouchableOpacity onPress={() => openEditModal('product', prod)} style={[styles.smallIconAction, { backgroundColor: theme.inputBg, borderColor: theme.border, marginRight: 4 }]}>
+                      <MaterialCommunityIcons name="pencil-outline" size={15} color="#00B4D8" />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => handleDeleteProduct(prod.id)} style={[styles.smallIconAction, { backgroundColor: theme.inputBg, borderColor: theme.border }]}>
+                      <MaterialCommunityIcons name="delete-outline" size={15} color="#EF4444" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              );
+            })}
+          </>
+        )}
+
+        {/* --- 4. الموظفين --- */}
+        {activeTab === 'hr' && (
+          <>
+            <View style={[styles.formCard, { backgroundColor: theme.cardBg, borderColor: theme.border, marginBottom: 20 }]}>
+              <Text style={[styles.formTitle, { color: theme.textMain }]}>👨‍💼 تسجيل موظف جديد ورواتب</Text>
+              <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="اسم الموظف..." placeholderTextColor={theme.textSub} value={empName} onChangeText={setEmpName} />
+              <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="الراتب الشهري..." placeholderTextColor={theme.textSub} keyboardType="numeric" value={empSalary} onChangeText={setEmpSalary} />
+              <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="رقم هاتف التواصل..." placeholderTextColor={theme.textSub} keyboardType="phone-pad" value={empPhone} onChangeText={setEmpPhone} />
+              
+              <TouchableOpacity style={[styles.actionBtn, { backgroundColor: theme.accentPink, width: '100%' }]} onPress={handleAddEmployee}>
+                <MaterialCommunityIcons name="account-check-outline" size={18} color="#FFF" style={{ marginRight: 6 }} />
+                <Text style={styles.btnText}>حفظ بيانات الموظف</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={[styles.sectionTitleHeader, { color: theme.textMain }]}>قائمة الموظفين المسجلين ({employees.length})</Text>
+            {employees.map(emp => (
+              <View key={emp.id} style={[styles.customerCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+                <View style={[styles.cardIconBox, { backgroundColor: 'rgba(247, 37, 133, 0.12)' }]}>
+                  <MaterialCommunityIcons name="badge-account-horizontal-outline" size={18} color={theme.accentPink} />
+                </View>
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                  <Text style={[styles.custName, { color: theme.textMain }]}>{emp.name}</Text>
+                  <Text style={[styles.custPhone, { color: theme.textSub }]}>📞 {emp.phone}</Text>
+                </View>
+                <View style={{ alignItems: 'flex-end', marginRight: 10 }}>
+                  <Text style={{ fontSize: 9, color: theme.textSub }}>الراتب:</Text>
+                  <Text style={[styles.custDue, { color: theme.accentPink }]}>{emp.salary} ج.م</Text>
+                </View>
+                <View style={{ flexDirection: 'row', marginLeft: 4 }}>
+                  <TouchableOpacity onPress={() => openEditModal('employee', emp)} style={[styles.smallIconAction, { backgroundColor: theme.inputBg, borderColor: theme.border, marginRight: 4 }]}>
+                    <MaterialCommunityIcons name="pencil-outline" size={15} color="#00B4D8" />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleDeleteEmployee(emp.id)} style={[styles.smallIconAction, { backgroundColor: theme.inputBg, borderColor: theme.border }]}>
+                    <MaterialCommunityIcons name="delete-outline" size={15} color="#EF4444" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+          </>
+        )}
+
+        {/* --- 5. التقارير --- */}
+        {activeTab === 'reports' && (
+          <>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
+              <Text style={[styles.sectionTitleHeader, { color: theme.textMain, marginBottom: 0 }]}>📈 لوحة مؤشرات الأداء والتقارير</Text>
+              <TouchableOpacity style={[styles.shareReportBtn, { backgroundColor: theme.accentGreen }]} onPress={handleShareReport}>
+                <MaterialCommunityIcons name="share-variant-outline" size={15} color="#FFF" style={{ marginRight: 4 }} />
+                <Text style={{ color: '#FFF', fontSize: 11, fontWeight: 'bold' }}>مشاركة التقرير</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={[styles.reportCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+              <View style={[styles.reportIconCircle, { backgroundColor: 'rgba(239, 68, 68, 0.12)' }]}>
+                <MaterialCommunityIcons name="account-cash-outline" size={22} color="#EF4444" />
+              </View>
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text style={[styles.reportTitle, { color: theme.textSub }]}>إجمالي مديونيات العملاء</Text>
+                <Text style={[styles.reportValue, { color: '#EF4444' }]}>{totalCustomerDue} ج.م</Text>
+              </View>
+            </View>
+
+            <View style={[styles.reportCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+              <View style={[styles.reportIconCircle, { backgroundColor: 'rgba(247, 127, 0, 0.12)' }]}>
+                <MaterialCommunityIcons name="package-variant-closed" size={22} color={theme.accentOrange} />
+              </View>
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text style={[styles.reportTitle, { color: theme.textSub }]}>إجمالي القيمة السوقية لبضاعة المخزن</Text>
+                <Text style={[styles.reportValue, { color: theme.accentOrange }]}>{totalInventoryVal} ج.م</Text>
+              </View>
+            </View>
+
+            <View style={[styles.reportCard, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+              <View style={[styles.reportIconCircle, { backgroundColor: 'rgba(247, 37, 133, 0.12)' }]}>
+                <MaterialCommunityIcons name="cash-multiple" size={22} color={theme.accentPink} />
+              </View>
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text style={[styles.reportTitle, { color: theme.textSub }]}>إجمالي الرواتب الشهرية للموظفين</Text>
+                <Text style={[styles.reportValue, { color: theme.accentPink }]}>{totalSalaries} ج.م</Text>
+              </View>
+            </View>
+          </>
+        )}
+
+      </ScrollView>
+
+      {/* نافذة التعديل */}
+      <Modal animationType="slide" transparent={true} visible={editModalVisible} onRequestClose={() => setEditModalVisible(false)}>
         <View style={styles.modalOverlay}>
-          <View style={[styles.menuContainer, { backgroundColor: theme.cardBg }]}>
-            <Text style={[styles.menuHeaderTitle, { color: theme.textMain }]}>⚙️ إعدادات التطبيق</Text>
+          <View style={[styles.modalContent, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
+            <Text style={[styles.formTitle, { color: theme.textMain, marginBottom: 15 }]}>✏️ نافذة تحديث البيانات</Text>
 
-            <View style={styles.menuItemRow}>
-              <Text style={{ color: theme.textMain, fontSize: 16 }}>الوضع الليلي 🌙</Text>
-              <Switch value={isDarkMode} onValueChange={toggleTheme} />
+            <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="الاسم أو البيان..." placeholderTextColor={theme.textSub} value={editField1} onChangeText={setEditField1} />
+            <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="القيمة المالية أو السعر..." placeholderTextColor={theme.textSub} keyboardType="numeric" value={editField2} onChangeText={setEditField2} />
+            <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="الكمية أو الهاتف..." placeholderTextColor={theme.textSub} keyboardType="numeric" value={editField3} onChangeText={setEditField3} />
+
+            {editingType === 'product' && (
+              <TextInput style={[styles.input, { backgroundColor: theme.inputBg, color: theme.textMain, borderColor: theme.border }]} placeholder="الإيموجي التعبيري..." placeholderTextColor={theme.textSub} value={editEmoji} onChangeText={setEditEmoji} maxLength={2} />
+            )}
+
+            <View style={styles.btnRow}>
+              <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#00B4D8', flex: 1, marginLeft: 6 }]} onPress={handleSaveEdit}>
+                <Text style={styles.btnText}>حفظ التعديلات</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#64748B', flex: 1, marginRight: 6 }]} onPress={() => setEditModalVisible(false)}>
+                <Text style={styles.btnText}>إلغاء الأمر</Text>
+              </TouchableOpacity>
             </View>
-
-            <View style={styles.menuItemRow}>
-              <Text style={{ color: theme.textMain, fontSize: 16 }}>قفل إدارة الشحنات بكلمة مرور 🔒</Text>
-              <Switch value={customPinEnabled} onValueChange={handleTogglePinFeature} />
-            </View>
-
-            <TouchableOpacity
-              style={styles.changePinMenuBtn}
-              onPress={() => {
-                setMenuVisible(false);
-                setPinSetupModal(true);
-              }}
-            >
-              <Text style={{ color: '#FFF', fontWeight: 'bold', fontSize: 15 }}>🔑 تغيير كلمة السر السريعة</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.closeMenuBtn} onPress={() => setMenuVisible(false)}>
-              <Text style={{ color: '#FFF', fontWeight: 'bold' }}>إغلاق القائمة</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -1142,103 +770,71 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  splashContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  splashLogo: {
-    width: 120,
-    height: 120,
-    borderRadius: 20,
-    marginBottom: 20,
-  },
-  splashWelcome: {
-    fontSize: 22,
-    color: '#94A3B8',
-    marginBottom: 5,
-  },
-  splashTitle: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 8,
-  },
-  splashSubtitle: {
-    fontSize: 16,
-    color: '#0284C7',
-    fontWeight: '600',
-  },
+  // شاشة الترحيب ستايلات
+  welcomeContainer: { flex: 1, justifyContent: 'space-between', alignItems: 'center', paddingVertical: 40, paddingHorizontal: 25 },
+  welcomeContent: { flex: 1, justifyContent: 'center', alignItems: 'center', width: '100%' },
+  welcomeIconCircle: { width: 95, height: 95, borderRadius: 48, backgroundColor: 'rgba(0, 180, 216, 0.15)', justifyContent: 'center', alignItems: 'center', marginBottom: 20, borderWidth: 1, borderColor: '#00B4D8' },
+  welcomeTitle: { fontSize: 24, fontWeight: 'bold', color: '#FFFFFF', marginBottom: 15, textAlign: 'center' },
+  
+  aboutBox: { backgroundColor: 'rgba(255, 255, 255, 0.07)', padding: 16, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)', marginBottom: 25, width: '100%' },
+  aboutText: { fontSize: 12, color: '#E2E8F0', textAlign: 'center', lineHeight: 21 },
 
-  offlineBanner: { backgroundColor: '#EF4444', padding: 6, alignItems: 'center' },
-  offlineText: { color: '#FFF', fontWeight: 'bold', fontSize: 12 },
-  header: { flexDirection: 'row', alignItems: 'center', padding: 12, borderBottomWidth: 1 },
-  menuBtn: { padding: 8, borderRadius: 8 },
-  headerTextContainer: { flex: 1, marginHorizontal: 10 },
-  title: { fontSize: 18, fontWeight: 'bold' },
-  subtitle: { fontSize: 11, color: '#94A3B8', marginTop: 2 },
-  logo: { width: 40, height: 40, borderRadius: 8 },
-  tabBar: { flexDirection: 'row', borderBottomWidth: 1, paddingVertical: 6 },
-  tabItem: { flex: 1, alignItems: 'center', paddingVertical: 8 },
-  activeTabItem: { borderBottomWidth: 2, borderBottomColor: '#0284C7' },
-  tabText: { fontWeight: 'bold', fontSize: 14 },
-  contentContainer: { flex: 1, padding: 12 },
-  searchInput: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, height: 45, marginBottom: 10 },
-  
-  companiesScrollWrapper: { height: 50, marginBottom: 10 },
-  companiesScrollContainer: { alignItems: 'center', paddingVertical: 5 },
-  companyChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, marginHorizontal: 4 },
-  
-  locationCard: { borderWidth: 1, borderRadius: 12, padding: 12, marginBottom: 12 },
-  cardHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
-  locationName: { fontSize: 15, fontWeight: 'bold', flex: 1, marginRight: 8 },
-  companyBadge: { backgroundColor: '#0284C7', color: '#FFF', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, fontSize: 11, overflow: 'hidden' },
-  locationNotes: { fontSize: 13, marginBottom: 10 },
-  cardActionsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 },
-  actionBtn: { flex: 1, marginHorizontal: 3, paddingVertical: 8, borderRadius: 8, alignItems: 'center' },
-  actionBtnText: { color: '#FFF', fontWeight: 'bold', fontSize: 13 },
-  formCard: { borderWidth: 1, borderRadius: 12, padding: 12, marginBottom: 15 },
-  formTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 10 },
-  input: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 10, height: 42, marginBottom: 10 },
-  
-  statusSelectRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 },
-  statusChipSelect: { flex: 1, marginHorizontal: 3, paddingVertical: 8, borderRadius: 8, borderWidth: 1, alignItems: 'center' },
+  startAppBtn: { backgroundColor: '#00B4D8', width: '100%', height: 48, borderRadius: 14, justifyContent: 'center', alignItems: 'center', marginBottom: 12, shadowColor: '#00B4D8', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 6, elevation: 6 },
+  startAppBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: 'bold' },
 
-  submitBtn: { backgroundColor: '#0284C7', borderRadius: 8, paddingVertical: 10, alignItems: 'center', marginTop: 5 },
-  submitBtnText: { color: '#FFF', fontWeight: 'bold', fontSize: 14 },
-  savedHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  savedTitle: { fontSize: 16, fontWeight: 'bold' },
-  exportAllBtn: { backgroundColor: '#16A34A', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 },
-  exportAllText: { color: '#FFF', fontWeight: 'bold', fontSize: 12 },
-  shipmentCard: { borderWidth: 1, borderRadius: 12, padding: 12, marginBottom: 10 },
-  shipmentDriver: { fontSize: 15, fontWeight: 'bold' },
-  statusBadge: { color: '#FFF', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, fontSize: 11, overflow: 'hidden' },
-  shipmentDetail: { fontSize: 13, marginBottom: 4 },
-  shipmentDate: { fontSize: 11, marginTop: 4, marginBottom: 8 },
-  etaBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(0, 230, 118, 0.1)', padding: 8, borderRadius: 8, marginBottom: 10 },
-  etaTextContainer: { marginLeft: 8 },
-  etaLabel: { fontSize: 11, color: '#94A3B8' },
-  etaValue: { fontSize: 13, fontWeight: 'bold', color: '#00E676' },
-  shipmentActionsRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  shipmentActionBtn: { flex: 1, marginHorizontal: 2, paddingVertical: 6, borderRadius: 6, alignItems: 'center' },
-  aboutCard: { borderWidth: 1, borderRadius: 12, padding: 16, alignItems: 'center' },
-  aboutLogo: { width: 70, height: 70, borderRadius: 12, marginBottom: 10 },
-  aboutTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 4 },
-  devNameText: { color: '#0284C7', fontWeight: 'bold', fontSize: 13, marginBottom: 6 },
-  copyrightText: { color: '#94A3B8', fontSize: 11, textAlign: 'center', fontWeight: '600', marginBottom: 10 },
-  aboutDesc: { fontSize: 13, textAlign: 'center', lineHeight: 20, marginBottom: 10 },
-  customerServiceBtn: { backgroundColor: '#0284C7', width: '100%', padding: 10, borderRadius: 8, alignItems: 'center' },
-  customerServiceBtnText: { color: '#FFF', fontWeight: 'bold', fontSize: 14 },
-  underEditNoticeText: { color: '#D97706', fontSize: 12, textAlign: 'center', marginTop: 6 },
-  devContactBtn: { backgroundColor: '#10B981', width: '100%', padding: 10, borderRadius: 8, alignItems: 'center', marginBottom: 10 },
-  devContactBtnText: { color: '#FFF', fontWeight: 'bold', fontSize: 14 },
-  aboutQuickActions: { flexDirection: 'row', width: '100%', marginTop: 5 },
-  aboutActionBtn: { paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  menuContainer: { borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, minHeight: 250 },
-  menuHeaderTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
-  menuItemRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: '#334155' },
-  changePinMenuBtn: { backgroundColor: '#0284C7', padding: 12, borderRadius: 8, alignItems: 'center', marginVertical: 10 },
-  modalStatusOptionBtn: { padding: 12, borderRadius: 8, borderWidth: 1, marginBottom: 8, alignItems: 'center' },
-  closeMenuBtn: { backgroundColor: '#DC2626', padding: 12, borderRadius: 8, alignItems: 'center', marginTop: 15 }
+  whatsappBtn: { backgroundColor: 'rgba(37, 211, 102, 0.12)', width: '100%', height: 48, borderRadius: 14, borderWidth: 1, borderColor: '#25D366', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+  whatsappBtnText: { color: '#25D366', fontSize: 14, fontWeight: 'bold' },
+
+  welcomeFooter: { fontSize: 11, color: '#8E9BAE', fontWeight: '600', letterSpacing: 0.5 },
+
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 15, paddingVertical: 12, borderBottomWidth: 1 },
+  headerLogoBox: { width: 36, height: 36, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
+  appName: { fontSize: 14, fontWeight: 'bold' },
+  appSubtitle: { fontSize: 9, color: '#8E9BAE', marginTop: 1 },
+  resetIconBtn: { width: 33, height: 33, borderRadius: 9, borderWidth: 1, justifyContent: 'center', alignItems: 'center' },
+  
+  tabBar: { flexDirection: 'row', padding: 4, margin: 12, marginBottom: 6, borderRadius: 14, borderWidth: 1 },
+  tabBtn: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 10 },
+  tabText: { fontSize: 9, fontWeight: 'bold' },
+
+  scrollContent: { padding: 14, paddingTop: 4 },
+  
+  balanceCard: { borderRadius: 18, borderWidth: 1, padding: 18, marginBottom: 15, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
+  balanceHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  balanceTitle: { fontSize: 12 },
+  balanceAmount: { fontSize: 28, fontWeight: 'bold', marginBottom: 14 },
+  rowStats: { flexDirection: 'row', width: '100%', borderTopWidth: 1, paddingTop: 12, justifyContent: 'space-around' },
+  statItem: { alignItems: 'center' },
+  statLabel: { fontSize: 10, marginBottom: 3 },
+  statValue: { fontSize: 14, fontWeight: 'bold' },
+  statDivider: { width: 1, height: '100%' },
+
+  formCard: { borderRadius: 18, borderWidth: 1, padding: 16 },
+  formTitle: { fontSize: 13, fontWeight: 'bold', marginBottom: 12 },
+  input: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 13, height: 44, marginBottom: 10, fontSize: 12 },
+  btnRow: { flexDirection: 'row', marginTop: 4 },
+  actionBtn: { height: 44, borderRadius: 12, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+  btnText: { color: '#FFF', fontSize: 12, fontWeight: 'bold' },
+  
+  sectionTitleHeader: { fontSize: 13, fontWeight: 'bold', marginBottom: 10 },
+  shareReportBtn: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 9 },
+  filterBadgeBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 9, borderRadius: 12, borderWidth: 1 },
+  lowStockTag: { backgroundColor: '#EF4444', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 5, marginRight: 6 },
+  
+  emojiBox: { width: 38, height: 38, borderRadius: 10, borderWidth: 1, justifyContent: 'center', alignItems: 'center' },
+  cardIconBox: { width: 36, height: 36, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
+  customerCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 11, borderRadius: 14, borderWidth: 1, marginBottom: 8 },
+  custName: { fontSize: 12, fontWeight: 'bold' },
+  custPhone: { fontSize: 10, marginTop: 2 },
+  custDue: { fontSize: 13, fontWeight: 'bold' },
+  deleteIconBtn: { padding: 6, marginLeft: 4 },
+  smallIconAction: { width: 30, height: 30, borderRadius: 8, borderWidth: 1, justifyContent: 'center', alignItems: 'center' },
+
+  reportCard: { flexDirection: 'row', alignItems: 'center', padding: 15, borderRadius: 16, borderWidth: 1, marginBottom: 10 },
+  reportIconCircle: { width: 42, height: 42, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  reportTitle: { fontSize: 11, marginBottom: 3 },
+  reportValue: { fontSize: 18, fontWeight: 'bold' },
+
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.65)', justifyContent: 'center', padding: 22 },
+  modalContent: { borderRadius: 18, borderWidth: 1, padding: 20 }
 });
